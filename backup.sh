@@ -4,7 +4,7 @@ WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
 RETENTION=10
 DATE=$(date +"%m-%d-%Y")
 TIME=$(date +"%c")
-TARGET_DIR="/shares/levis /shares/freebox"
+TARGET_DIR="/shares/bbox"
 LOG_DIRECTORY="/var/log/backup"
 LOG_FILE="$LOG_DIRECTORY/backup-error.log"
 
@@ -47,15 +47,6 @@ case $hostname in
 	tar cjf $i/Backup/$hostname/$DATE.IFCFG.tbz /etc/sysconfig/network/* >/dev/null 2>&1
 	tar cjf $i/Backup/$hostname/$DATE.SCRIPTS.tbz /opt/ffx/scripts/* >/dev/null 2>&1
 	;;
-	#docker exec -it 6eb6307fb389 mysqldump wordpress | bzip2 > $i/Backup/$hostname/$DATE.MYSQL_WORDPRESS.sql.bz2
-
-	CENTREON)
-	mysqldump -u root centreon | bzip2 > $i/Backup/$hostname/$DATE.CENTREON_DB.sql.bz2
-	tar cjf $i/Backup/$hostname/$DATE.PLUGINS.tbz /usr/lib/nagios/plugins/ >/dev/null 2>&1
-	tar cjf $i/Backup/$hostname/$DATE.SCRIPTS.tbz /opt/ffx/scripts/* >/dev/null 2>&1
-	tar cjf $i/Backup/$hostname/$DATE.CENTREON_CONF.tbz /etc/centreon/* >/dev/null 2>&1
-	tar cjf $i/Backup/$hostname/$DATE.CENTREON_DATA.tbz /usr/share/centreon/www/ >/dev/null 2>&1
-	;;
 
 	OSX|MAC*)
 	tar cjf $i/Backup/$hostname/$DATE.CONF.tbz  /etc/nrpe.cfg /etc/snmp/snmpd.conf ~/.bashrc /etc/hosts >/dev/null 2>&1
@@ -63,9 +54,9 @@ case $hostname in
 	tar cjf $i/Backup/$hostname/$DATE.SCRIPTS.tbz /opt/ffx/scripts/* >/dev/null 2>&1
 	;;
 
-	*X)
-	tar cjf $i/Backup/$hostname/$DATE.DOCKER.tbz /opt/ffx/docker/ >/dev/null 2>&1
-	tar cjf $i/Backup/$hostname/$DATE.DATA.tbz /appsef/ >/dev/null 2>&1
+	*)
+	tar cjf $i/Backup/$hostname/$DATE.SCRIPTS.tbz /opt/ffx/docker/ >/dev/null 2>&1
+	tar cjf $i/Backup/$hostname/$DATE.ETC.tbz /etc/fstab /etc/network/interfaces /etc/systemd/system/ >/dev/null 2>&1
 	;;
 
 	*)
