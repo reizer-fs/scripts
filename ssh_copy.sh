@@ -1,7 +1,7 @@
 #!/bin/sh
 
 WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
-HOSTS="sfx2 centreon solarisx2 solarisxi FFXUBSWSX UBUNTUFFX"
+HOSTS="X64 FFXUBSWSX UBUNTUFFX"
 
 if [ ! -f ~/.ssh/id_rsa.pub ] ; then
 	ssh-keygen -t rsa

@@ -9,21 +9,20 @@ ff02::2         ipv6-allrouters
 ff02::3         ipv6-allhosts
 
 127.0.0.1 ejie.me
+192.168.92.210 mysql-centreon
+192.168.92.211 mysql-instances
+192.168.92.212 mysql-recette
+192.168.92.213 mysql-ffx
 
-192.168.127.130 solarisxi
-192.168.127.134 solarisx2
-192.168.127.201 squidx
-192.168.127.202 mysql-centreon
-192.168.127.203 mysql-ffx
-192.168.127.204 apache-ffx
-192.168.127.205 samba
-192.168.127.206 torrentbox
-192.168.127.207 debian-kali
 
-192.168.1.100 OSX osx
-192.168.1.102 ffxubswsx
-192.168.1.103 ffxubswsx
-192.168.1.120 ubuntuffx
-192.168.1.253 CENTREON centreon
-192.168.1.221 sfx1
-192.168.1.222 sfx2
+192.168.92.220 apache-centreon
+192.168.92.221 apache-ffx
+192.168.92.221 apache-splunk
+
+
+192.168.92.230 samba-share
+192.168.92.231 samba-basic
+192.168.92.232 git
+192.168.92.233 kali
+
+192.168.92.164 X64
