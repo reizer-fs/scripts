@@ -17,6 +17,8 @@ alias dr='docker rm'
 alias dri='docker rmi'
 alias di='docker images'
 alias dclean='docker rm $(docker ps -a -q)'
+alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
+alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
