@@ -17,16 +17,18 @@ alias dr='docker rm'
 alias dri='docker rmi'
 alias di='docker images'
 alias dclean='docker rm $(docker ps -a -q)'
+alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
+alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
 function ds () {
-    docker start $1
+    docker start $@
 }
 
 function dk () {
-    docker stop $1
+    docker stop $@
 }
 
 db() { docker build -t=$1 .; }
