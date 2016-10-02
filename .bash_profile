@@ -1,5 +1,8 @@
+
+if [ ! $(uname -n) = "X64" ] ; then
 export http_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
 export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
+fi
 
 #export PS1="[ \t ] \[$(tput sgr0)\]\[\033[38;5;196m\]\u@\h\[$(tput sgr0)\]\[\033[38;5;15m\]:\[$(tput sgr0)\]\[\033[38;5;196m\]\w:\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
 export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput setaf 1)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 1)\]\h \[$(tput setaf 1)\]\W\[$(tput setaf 0)\]]\[$(tput setaf 0)\]\\$ \[$(tput sgr0)\]"
@@ -17,6 +20,7 @@ alias dr='docker rm'
 alias dri='docker rmi'
 alias di='docker images'
 alias dclean='docker rm $(docker ps -a -q)'
+alias dcleanvolume='docker volume rm  $(docker volume ls -qf dangling=true)'
 alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
 alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
 
@@ -43,7 +47,6 @@ alias cdscript='cd /opt/ffx/scripts'
 alias cdplugins='cd /usr/lib/nagios/plugins/'
 alias cddownloads='cd /data/docker/samba/samba-basic/shares/downloads/'
 #### Alias Sesction ####
-alias proxy="export http_proxy=http://sfx2:3128"
 alias ll='ls -l'
 alias la='ls -ltra'
 
