@@ -38,13 +38,18 @@ case $HOSTNAME in
 	;;
 esac
 
+start_docker_sql_backup() {
+MYSQL_DOCKER=$(docker ps | grep mysql |awk '{print $NF}')
+for e in $MYSQL_DOCKER ; do docker exec $e sh -c "exec mysqldump --all-databases" | bzip2 > $i/Backup/$HOSTNAME/$DATE-$e.sql.bz2 ; done
+}
+
 start_backup() {
 echo "#### Starting Backup $TIME ####" >> $LOG_FILE
+start_docker_sql_backup
 tar cjf $i/Backup/$HOSTNAME/$DATE.SCRIPTS.tbz /opt/ffx/docker/ /opt/ffx/systems /opt/ffx/scripts /opt/ffx/centreon >/dev/null 2>&1
 tar cjf $i/Backup/$HOSTNAME/$DATE.ETC.tbz /etc/fstab /etc/network/interfaces /etc/systemd/system/ /etc/default/docker >/dev/null 2>&1
 echo "#### End Backup $TIME ####" >> $LOG_FILE && echo "" >> $LOG_FILE
 echo "----------------------" >> $LOG_FILE && echo "" >> $LOG_FILE
-
 }
 
 purge_backup() {
@@ -58,7 +63,9 @@ check_mountpoint() {
 mountpoint -q $1 && return 0 || return 1
 }
 
+
 for i in $TARGET_DIR ; do
 	check_mountpoint $i && start_backup || echo "#### Problem on folder $i at $TIME ####" >> $LOG_FILE
 	purge_backup
 done
+
