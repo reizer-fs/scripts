@@ -18,7 +18,12 @@ ff02::3         ipv6-allhosts
 192.168.56.5   x64
 
 #Proxy Host
+<<<<<<< HEAD
 192.168.56.90 proxywebsrv.tech.sits.credit-agricole.fr proxywebsrv
+=======
+192.168.56.99 proxywebsrv.tech.sits.credit-agricole.fr proxywebsrv
+192.168.1.210 proxywebsrv.tech.sits.credit-agricole.fr proxywebsrv
+>>>>>>> 946be10e81904513599f5c9507d6aea2f89b35e9
 
 #Mysql DB
 192.168.56.100 mysql-ffx
