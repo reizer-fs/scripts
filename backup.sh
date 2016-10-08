@@ -49,7 +49,7 @@ echo "----------------------" >> $LOG_FILE && echo "" >> $LOG_FILE
 
 purge_backup() {
 echo "#### Starting Purge $TIME ####" >> $LOG_FILE
-find $i/Backup/$HOSTNAME -type f -iname *.tbz -mtime +$RETENTION -delete && echo "#### Purge was successful in $i at $TIME ####" >> $LOG_FILE
+find $i/Backup/$HOSTNAME -type f -mtime +$RETENTION -delete && echo "#### Purge was successful in $i at $TIME ####" >> $LOG_FILE
 echo "#### End Purge $TIME ####" >> $LOG_FILE && echo "" >> $LOG_FILE
 echo "----------------------" >> $LOG_FILE && echo "" >> $LOG_FILE
 }

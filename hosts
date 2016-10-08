@@ -18,24 +18,24 @@ ff02::3         ipv6-allhosts
 192.168.56.5   x64
 
 #Proxy Host
-192.168.56.99 proxywebsrv.tech.sits.credit-agricole.fr proxywebsrv
+192.168.56.90 proxywebsrv.tech.sits.credit-agricole.fr proxywebsrv
 
 #Mysql DB
 192.168.56.100 mysql-ffx
 192.168.56.101 mysql-centreon
 
-#
+#Docker App's
 192.168.56.90  suse-squid
 192.168.56.91  suse-samba
 192.168.56.92  suse-torrentbox
+192.168.56.93  splunk-light
+192.168.56.94  splunk
 192.168.56.101 centos-centreon
 192.168.56.101 centreon
 
 #Web FrontEnd
 192.168.56.200 apache-ffx
 192.168.56.201 apache-drupal
-192.168.56.202 splunk-light
-192.168.56.203 splunk
 192.168.56.204 webmin
 
 192.168.1.100 OSX osx
