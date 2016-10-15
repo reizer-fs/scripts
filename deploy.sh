@@ -2,7 +2,7 @@
 
 HOSTNAME=$(hostname | tr '[:lower:]' '[:upper:]')
 WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
-HOSTS="X64 UBUNTUFFX X XVM"
+HOSTS="X64 UBUNTUFFX X XVM XFX"
 DIR_TO_SYNC="/opt/ffx/ /etc/cron.d"
 
 if [ ! -z $1 ] ; then

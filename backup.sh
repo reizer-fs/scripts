@@ -15,28 +15,24 @@ if [ ! -d $LOG_DIRECTORY ] ; then
 	mkdir -p $LOG_DIRECTORY
 fi
 
-# Create mount/backup directory if missing
-case $HOSTNAME in
-	OSX|MACBOOK*)
-		TARGET_DIR="/Volumes/OSX_DATA/Backup"
-		if [ ! -d $TARGET_DIR/Backup/$HOSTNAME ] ; then
-		mkdir -p $i/Backup/$HOSTNAME
-		fi
-	;;
+# Different directory on OSX
+if [ $HOSTNAME = "OSX" ]; then
+	TARGET_DIR="/Volumes/OSX_DATA/Backup"
+fi
 
-	*)
-		for i in $TARGET_DIR ; do
-			if [ ! -d $i ] ; then
-				mkdir $i
+# Create mount/backup directory if missing
+for i in $TARGET_DIR ; do
+		if [ ! -d $i ] ; then
+			mkdir $i
+		fi
+		if mountpoint -q $i ; then
+			if [ ! -d $i/Backup/$HOSTNAME ] ; then
+				mkdir -p $i/Backup/$HOSTNAME
 			fi
-			if mountpoint -q $i ; then
-				if [ ! -d $i/Backup/$HOSTNAME ] ; then
-					mkdir -p $i/Backup/$HOSTNAME
-				fi
-			fi
-		done
-	;;
-esac
+		else
+		mount $i
+		fi
+done
 
 start_docker_sql_backup() {
 MYSQL_DOCKER=$(docker ps | grep mysql |awk '{print $NF}')
@@ -48,6 +44,7 @@ echo "#### Starting Backup $TIME ####" >> $LOG_FILE
 start_docker_sql_backup
 tar cjf $i/Backup/$HOSTNAME/$DATE.SCRIPTS.tbz /opt/ffx/docker/ /opt/ffx/systems /opt/ffx/scripts /opt/ffx/centreon >/dev/null 2>&1
 tar cjf $i/Backup/$HOSTNAME/$DATE.ETC.tbz /etc/fstab /etc/network/interfaces /etc/systemd/system/ /etc/default/docker >/dev/null 2>&1
+tar cjf $i/Backup/$HOSTNAME/$DATE.DATA.tbz /data >/dev/null 2>&1
 echo "#### End Backup $TIME ####" >> $LOG_FILE && echo "" >> $LOG_FILE
 echo "----------------------" >> $LOG_FILE && echo "" >> $LOG_FILE
 }
@@ -65,7 +62,6 @@ mountpoint -q $1 && return 0 || return 1
 
 
 for i in $TARGET_DIR ; do
-	check_mountpoint $i && start_backup || echo "#### Problem on folder $i at $TIME ####" >> $LOG_FILE
+	check_mountpoint $i && start_backup 2>&1 >> $LOG_FILE || echo "#### Problem on folder $i at $TIME ####" 2>&1 >> $LOG_FILE
 	purge_backup
 done
-
