@@ -2,7 +2,7 @@
 
 HOSTNAME=$(hostname | tr '[:lower:]' '[:upper:]')
 WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
-HOSTS="X64 UBUNTUFFX X XVM XFX"
+HOSTS="X64 UBUNTUFFX X XVM XFX OSX"
 DIR_TO_SYNC="/opt/ffx/ /etc/cron.d"
 
 if [ ! -z $1 ] ; then
@@ -14,9 +14,10 @@ for hosts in $HOSTS ; do
 		for i in $DIR_TO_SYNC ; do
 			ssh $hosts "if [ ! -d $i ]; then mkdir -p $i ; fi"
 			rsync -az $i/ $hosts:$i/ 
-			[ $? = 0 ] && echo "Copy successfully terminated on $hosts for $i."
 		done
 	else
 		echo "[ $hosts ] is unreachable."
+		continue
 	fi
+	echo "[ $hosts ] \t done."
 done

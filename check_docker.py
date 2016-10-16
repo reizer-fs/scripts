@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from datetime import datetime, timezone
 
-__author__ = 'Tim Laurence'
+__author__ = 'FFX'
 __copyright__ = "Copyright 2016"
-__credits__ = ['Tim Laurence']
+__credits__ = ['FFX']
 __license__ = "GPL"
 __version__ = "1.0"
 

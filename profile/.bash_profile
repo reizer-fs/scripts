@@ -17,6 +17,7 @@ alias dr='docker rm'
 alias dri='docker rmi'
 alias di='docker images'
 alias dclean='docker rm $(docker ps -a -q)'
+alias dcleanvolume='docker volume rm  $(docker volume ls -qf dangling=true)'
 alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
 alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
 
@@ -65,6 +66,11 @@ alias header='curl -I'
 alias headerc='curl -I --compress'
 
 
+#Git
+alias gp='git push'
+alias gpull='git pull'
+alias gc='git commit -a'
+alias ga='git add'
 
 alias tcpdump='tcpdump -i'
 
