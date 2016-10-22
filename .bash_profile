@@ -26,18 +26,11 @@ alias sprofile="cp -rf .bash_profile /root/"
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
-function ds () {
-    docker start $@
-}
-
-function dk () {
-    docker stop $@
-}
-
+ds () { docker start $@ ; }
+dk () { docker stop $@ ; }
 db() { docker build -t=$1 .; }
 dforce() { echo 'Forcing container to start... Press Ctrl-C to cancel.' ; while true ; do docker start $1 2>&1 >/dev/null ; done; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
-
 
 export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput setaf 1)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 1)\]\h \[$(tput setaf 1)\]\W\[$(tput setaf 0)\]]\[$(tput setaf 0)\]\\$ \[$(tput sgr0)\]"
 
