@@ -21,8 +21,7 @@ alias dclean='docker rm $(docker ps -a -q)'
 alias dcleanvolume='docker volume rm  $(docker volume ls -qf dangling=true)'
 alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
 alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
-alias dforce="echo 'Forcing container to start... Press Ctrl-C to cancel.' ; while true ; do docker start $1 2>&1 >/dev/null ; done"
-alias sprofile="cp .bash_profile /root/ /opt/ffx/scripts/ /opt/ffx/scripts/profile"
+alias sprofile="cp -rf .bash_profile /root/"
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
@@ -36,6 +35,7 @@ function dk () {
 }
 
 db() { docker build -t=$1 .; }
+dforce() { echo 'Forcing container to start... Press Ctrl-C to cancel.' ; while true ; do docker start $1 2>&1 >/dev/null ; done; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
 
