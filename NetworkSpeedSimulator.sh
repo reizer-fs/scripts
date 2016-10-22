@@ -31,7 +31,7 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 VERSION=0.1
-device=eth0
+device=ens36
 bandwidth=100kbps
 latency=350ms
 packetloss=

@@ -1,5 +1,5 @@
-export http_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
-export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
+alias unsetproxy='unset http_proxy ; unset https_proxy'
+alias setproxy='export http_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/" ; export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"'
 
 #export PS1="[ \t ] \[$(tput sgr0)\]\[\033[38;5;196m\]\u@\h\[$(tput sgr0)\]\[\033[38;5;15m\]:\[$(tput sgr0)\]\[\033[38;5;196m\]\w:\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
 export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput setaf 1)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 1)\]\h \[$(tput setaf 1)\]\W\[$(tput setaf 0)\]]\[$(tput setaf 0)\]\\$ \[$(tput sgr0)\]"
@@ -7,10 +7,11 @@ export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput s
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l'
 alias l='ll'
+alias cdscripts='cd /opt/ffx/scripts'
+alias cdffx='cd /opt/ffx/'
 
 # Docker
 alias cddocker='cd /opt/ffx/docker'
-alias cdscripts='cd /opt/ffx/scripts'
 alias cddata='cd /data/docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
 alias dr='docker rm'
@@ -20,6 +21,8 @@ alias dclean='docker rm $(docker ps -a -q)'
 alias dcleanvolume='docker volume rm  $(docker volume ls -qf dangling=true)'
 alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
 alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
+alias dforce="echo 'Forcing container to start... Press Ctrl-C to cancel.' ; while true ; do docker start $1 2>&1 >/dev/null ; done"
+alias sprofile="cp .bash_profile /root/ /opt/ffx/scripts/ /opt/ffx/scripts/profile"
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
@@ -68,6 +71,7 @@ alias headerc='curl -I --compress'
 
 #Git
 alias gp='git push'
+alias gs='git status -s'
 alias gpull='git pull'
 alias gc='git commit -a'
 alias ga='git add'
