@@ -21,6 +21,7 @@ from http.client import HTTPConnection
 from urllib.request import AbstractHTTPHandler, HTTPHandler, HTTPSHandler, OpenerDirector
 import argparse
 import json
+import logging
 import socket
 from functools import lru_cache
 import re
@@ -36,7 +37,8 @@ UNIT_ADJUSTMENTS = {
     'b': 1,
     'k': 1024,
     'm': 1024 * 1024,
-    'g': 1024 * 1024 * 1024
+    'g': 1024 * 1024 * 1024,
+    't': 1024 * 1024 * 1024 * 1024
 }
 OK_RC = 0
 WARNING_RC = 1
@@ -135,6 +137,8 @@ def get_url(url):
 def get_container_info(name, type='json'):
     return get_url(daemon + '/containers/{container}/{type}'.format(container=name, type=type))
 
+def get_container_fx(name, type='json'):
+    return get_url(daemon + '/containers/{container}/{type}'.format(container=name, type=type))
 
 def get_status(container):
     return get_container_info(container)['State']['Status']
@@ -206,6 +210,23 @@ def check_status(container, desired_state):
         critical("{} state is not {}".format(container, desired_state))
     else:
         ok("{} status is {}".format(container, desired_state))
+
+def check_info(container, desired_state):
+    logger = logging.getLogger()
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    fh = logging.FileHandler('check_docker.log')
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    logger.debug('Running check.')
 
 
 def check_uptime(container, warn, crit, units=None):
@@ -290,6 +311,13 @@ def process_args(args):
                         type=str,
                         help='Minimum container uptime in seconds. Used to rapid restarting. Should be less than you monitoring poll interval.')
 
+    # Info
+    parser.add_argument('--info',
+                        dest='info',
+                        action='store',
+                        type=str,
+                        help='Gives information on Docker through API')
+
     # Restart
     parser.add_argument('--restarts',
                         dest='restarts',
@@ -330,7 +358,6 @@ def print_results():
     else:
         print(messages_concat)
 
-
 if __name__ == '__main__':
 
     #############################################################################################
@@ -349,6 +376,10 @@ if __name__ == '__main__':
                 unknown("No containers names found matching criteria")
             else:
                 for container in containers:
+
+                    # Check status
+                    if args.info:
+                        check_info(container, args.info)
 
                     # Check status
                     if args.status:

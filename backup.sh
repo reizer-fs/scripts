@@ -22,6 +22,7 @@ fi
 
 # Create mount/backup directory if missing
 for i in $TARGET_DIR ; do
+		mount $i
 		if [ ! -d $i ] ; then
 			mkdir $i
 		fi

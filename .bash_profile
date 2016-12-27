@@ -1,3 +1,5 @@
+
+
 alias unsetproxy='unset http_proxy ; unset https_proxy'
 alias setproxy='export http_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/" ; export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"'
 
@@ -9,6 +11,13 @@ alias ll='ls --color=auto -l'
 alias l='ll'
 alias cdscripts='cd /opt/ffx/scripts'
 alias cdffx='cd /opt/ffx/'
+
+#Tmux
+alias attachmux='tmux -2 attach -t '
+alias lsmux='tmux list-sessions'
+alias newmux='tmux -2 -f /etc/tmux.conf new -s '
+alias reloadmux='tmux source-file /etc/tmux.conf'
+alias vimux='vim /etc/tmux.conf'
 
 # Docker
 alias cddocker='cd /opt/ffx/docker'
