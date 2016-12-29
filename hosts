@@ -38,7 +38,7 @@ ff02::3         ipv6-allhosts
 #Web FrontEnd
 192.168.56.200 apache-ffx
 192.168.56.201 apache-drupal
-192.168.56.204 webmin
+192.168.56.204 apache-webmin
 
 192.168.1.100 OSX osx
 192.168.1.85  XFX xfx
