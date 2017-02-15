@@ -1,7 +1,11 @@
 #!/bin/sh
 
 WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
-HOSTS="sfx2 sfx3 sfx4 sfx5 sfx6 sfx7"
+HOSTS="X X64 XVM UBUNTUFX"
+
+if [ ! -z $@ ] ; then
+	HOSTS=$@
+fi
 
 for hosts in $HOSTS ; do 
 echo Processing $hosts ...
@@ -33,7 +37,10 @@ echo Processing $hosts ...
 #ssh root@$hosts 'mkdir -p /shares/usb && mount -a'
 #ssh root@$hosts 'echo "PRE_UP_SCRIPT=\"compat:suse:macchanger\"" >> /etc/sysconfig/network/ifcfg-eth2'
 #scp /etc/sysconfig/network/scripts/macchanger root@$hosts:/etc/sysconfig/network/scripts/macchanger
-ssh root@$hosts '/opt/ffx/scripts/backup.sh'
+#ssh root@$hosts '/opt/ffx/scripts/backup.sh'
+
+#Sync Hostnames
+ssh root@$hosts '/opt/ffx/scripts/sync_hostname.sh'
 
 echo ""
 done
