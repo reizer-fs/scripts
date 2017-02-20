@@ -1,12 +1,7 @@
-<<<<<<< HEAD
+
+export HOSTALIASES='/etc/hosts.aliases'
 export http_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
 export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
-=======
-
-
-alias unsetproxy='unset http_proxy ; unset https_proxy'
-alias setproxy='export http_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/" ; export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"'
->>>>>>> eaa1a7c8c09bba715a392eb52570a03898e0bb8d
 
 #export PS1="[ \t ] \[$(tput sgr0)\]\[\033[38;5;196m\]\u@\h\[$(tput sgr0)\]\[\033[38;5;15m\]:\[$(tput sgr0)\]\[\033[38;5;196m\]\w:\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
 export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput setaf 1)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 1)\]\h \[$(tput setaf 1)\]\W\[$(tput setaf 0)\]]\[$(tput setaf 0)\]\\$ \[$(tput sgr0)\]"
@@ -14,43 +9,22 @@ export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput s
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l'
 alias l='ll'
-<<<<<<< HEAD
+alias setproxy='export https_proxy="http://proxy:8080/" ; export https_proxy="http://proxy:8080/"'
 
 # Docker
 alias cddocker='cd /opt/ffx/docker'
 alias cdscripts='cd /opt/ffx/scripts'
-=======
-alias cdscripts='cd /opt/ffx/scripts'
-alias cdffx='cd /opt/ffx/'
-
-#Tmux
-alias attachmux='tmux -2 attach -t '
-alias lsmux='tmux list-sessions'
-alias newmux='tmux -2 -f /etc/tmux.conf new -s '
-alias reloadmux='tmux source-file /etc/tmux.conf'
-alias vimux='vim /etc/tmux.conf'
-
-# Docker
-alias cddocker='cd /opt/ffx/docker'
->>>>>>> eaa1a7c8c09bba715a392eb52570a03898e0bb8d
 alias cddata='cd /data/docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
 alias dr='docker rm'
 alias dri='docker rmi'
 alias di='docker images'
-<<<<<<< HEAD
-=======
-alias dclean='docker rm $(docker ps -a -q)'
-alias dcleanvolume='docker volume rm  $(docker volume ls -qf dangling=true)'
-alias dallstart='docker start `docker ps -a --format '{{.Names}}' -q | sort -r`'
-alias dallkill='docker start `docker ps -a --format '{{.Names}}' -q`'
-alias sprofile="cp -rf .bash_profile /root/"
->>>>>>> eaa1a7c8c09bba715a392eb52570a03898e0bb8d
+alias dvl='docker volume ls'
+alias dvr='docker volume rm'
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 
-<<<<<<< HEAD
 function ds () {
     docker start $1
 }
@@ -63,14 +37,6 @@ db() { docker build -t=$1 .; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
 
-=======
-ds () { docker start $@ ; }
-dk () { docker stop $@ ; }
-db() { docker build -t=$1 .; }
-dforce() { echo 'Forcing container to start... Press Ctrl-C to cancel.' ; while true ; do docker start $1 2>&1 >/dev/null ; done; }
-dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
-
->>>>>>> eaa1a7c8c09bba715a392eb52570a03898e0bb8d
 export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput setaf 1)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 1)\]\h \[$(tput setaf 1)\]\W\[$(tput setaf 0)\]]\[$(tput setaf 0)\]\\$ \[$(tput sgr0)\]"
 
 
@@ -101,15 +67,6 @@ alias header='curl -I'
 alias headerc='curl -I --compress'
 
 
-<<<<<<< HEAD
-=======
-#Git
-alias gp='git push'
-alias gs='git status -s'
-alias gpull='git pull'
-alias gc='git commit -a'
-alias ga='git add'
->>>>>>> eaa1a7c8c09bba715a392eb52570a03898e0bb8d
 
 alias tcpdump='tcpdump -i'
 

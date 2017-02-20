@@ -1,0 +1,15 @@
+#!/bin/bash
+
+perl -pi -e 's/^PermitRootLogin.*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
+perl -pi -e 's/^CONSOLE=/#CONSOLE=/g' /etc/default/login
+
+# Default Editor 
+update-alternatives --config editor
+
+# Docker default Proxy settings
+mkdir /etc/systemd/system/docker.service.d/
+echo '[Service]
+Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' > /etc/systemd/system/docker.service.d/http-proxy2.conf
+
+systemctl daemon-reload
+systemctl restart docker
