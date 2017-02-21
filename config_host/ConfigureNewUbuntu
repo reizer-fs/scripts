@@ -13,3 +13,6 @@ Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' > /etc
 
 systemctl daemon-reload
 systemctl restart docker
+
+# Git settings
+git config --global push.default matching

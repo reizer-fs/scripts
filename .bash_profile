@@ -16,7 +16,7 @@ alias cddocker='cd /opt/ffx/docker'
 alias cdscripts='cd /opt/ffx/scripts'
 alias cddata='cd /data/docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
-alias dr='docker rm'
+alias dr='docker rm -v'
 alias dri='docker rmi'
 alias di='docker images'
 alias dvl='docker volume ls'
@@ -130,6 +130,8 @@ case `uname -s` in
 	alias pgrep='ps -ef | grep -i'
 	alias tailf='tail -f'
 	alias mkdir='mkdir -p'
+	alias netstats='netstat -un -P tcp'
+	alias 'netstats -plantu'='netstat -aun'
 	
 	alive () {
 	ping -s $1 2 4
