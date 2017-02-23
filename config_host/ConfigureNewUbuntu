@@ -1,20 +1,40 @@
 #!/bin/bash
 
-perl -pi -e 's/^PermitRootLogin.*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
-perl -pi -e 's/^CONSOLE=/#CONSOLE=/g' /etc/default/login
+
+if [ -f host.env ]; then
+	. host.env
+fi
+
+FOLDER_TMUX="/etc/tmux.conf.d"
+FOLDER_DOCKER_SYSTCL="/etc/systemd/system/docker.service.d"
+
+FOLDER_LIST="$FOLDER_TMUX $FOLDER_DOCKER_SYSTCL $DOCUMENT_ROOT"
+
+for i in $FOLDER_LIST ; do
+	if [ ! -d $i ] ; then
+		mkdir -p $i
+	fi
+done
+
+# Package installation
+apt-get update
+apt-get install git
+
+
+# Create Link
+rm ~/.bash_profile
+ln -s .bash_profile ~/.bash_profile
+
 
 # Default Editor 
 update-alternatives --config editor
 
-# Docker default Proxy settings
-mkdir /etc/systemd/system/docker.service.d/
-echo '[Service]' > /etc/systemd/system/docker.service.d/http-proxy2.conf 
-echo 'Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' >> /etc/systemd/system/docker.service.d/http-proxy2.conf
+echo '[Service]' > $FOLDER_DOCKER_SYSTCL/http-proxy2.conf 
+echo 'Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' >> $FOLDER_DOCKER_SYSTCL/http-proxy2.conf
 
 systemctl daemon-reload
 systemctl restart docker
 
-mkdir /etc/tmux.conf.d
 
 # Git settings
 git config --global push.default matching
