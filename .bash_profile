@@ -24,6 +24,21 @@ alias dvr='docker volume rm'
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
+#TMUX2.3#
+alias attachmux='tmux -2 attach -t '
+alias lsmux='tmux list-sessions'
+alias newmux='tmux -2 -f /etc/tmux.conf.d/francis.conf new -s '
+alias reloadmux='tmux source-file /etc/tmux.conf.d/francis.conf'
+alias vimux='vim /etc/tmux.conf.d/francis.conf'
+export TERM=dtterm
+
+#Git
+alias gp='git push'
+alias gpull='git pull'
+alias gc='git commit -a'
+alias gs='git status -s'
+alias gdiff='git diff'
+
 
 function ds () {
     docker start $1

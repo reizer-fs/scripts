@@ -8,11 +8,13 @@ update-alternatives --config editor
 
 # Docker default Proxy settings
 mkdir /etc/systemd/system/docker.service.d/
-echo '[Service]
-Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' > /etc/systemd/system/docker.service.d/http-proxy2.conf
+echo '[Service]' > /etc/systemd/system/docker.service.d/http-proxy2.conf 
+echo 'Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' >> /etc/systemd/system/docker.service.d/http-proxy2.conf
 
 systemctl daemon-reload
 systemctl restart docker
+
+mkdir /etc/tmux.conf.d
 
 # Git settings
 git config --global push.default matching
