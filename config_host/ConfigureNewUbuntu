@@ -18,12 +18,22 @@ done
 
 # Package installation
 apt-get update
-apt-get install git
+apt-get install git tmux vim
 
+
+#TMUX default folder
+mkdir -p ~/.tmux/tmux-logging-master
+mkdir -p ~/.tmux/dev
+
+# Git cloning project
+cd $DOCUMENT_ROOT
+git clone https://github.com/reizer-fs/docker.git
+git clone https://github.com/reizer-fs/systems.git
+git clone https://github.com/reizer-fs/scripts.git
 
 # Create Link
 rm ~/.bash_profile
-ln -s .bash_profile ~/.bash_profile
+ln -s $DOCUMENT_ROOT/scripts/config_host/.bash_profile ~/.bash_profile
 
 
 # Default Editor 

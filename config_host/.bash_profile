@@ -38,6 +38,7 @@ alias gpull='git pull'
 alias gc='git commit -a'
 alias gs='git status -s'
 alias gdiff='git diff'
+alias ga='git add'
 
 
 function ds () {
@@ -60,7 +61,6 @@ alias cdscript='cd /opt/ffx/scripts'
 alias cdplugins='cd /usr/lib/nagios/plugins/'
 alias cddownloads='cd /data/docker/samba/samba-basic/shares/downloads/'
 #### Alias Sesction ####
-alias proxy="export http_proxy=http://sfx2:3128"
 alias ll='ls -l'
 alias la='ls -ltra'
 
