@@ -5,6 +5,10 @@ if [ -f host.env ]; then
 	. host.env
 fi
 
+if [ -z $DOCUMENT_ROOT ] ; then
+	DOCUMENT_ROOT="/opt/ffx/"
+fi
+
 FOLDER_TMUX="/etc/tmux.conf.d"
 FOLDER_DOCKER_SYSTCL="/etc/systemd/system/docker.service.d"
 
@@ -38,13 +42,6 @@ ln -s $DOCUMENT_ROOT/scripts/config_host/.bash_profile ~/.bash_profile
 
 # Default Editor 
 update-alternatives --config editor
-
-echo '[Service]' > $FOLDER_DOCKER_SYSTCL/http-proxy2.conf 
-echo 'Environment="HTTP_PROXY=http://sfx2:328/" "NO_PROXY=localhost,127.0.0.1"' >> $FOLDER_DOCKER_SYSTCL/http-proxy2.conf
-
-systemctl daemon-reload
-systemctl restart docker
-
 
 # Git settings
 git config --global push.default matching
