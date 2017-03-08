@@ -49,6 +49,10 @@ function dk () {
     docker stop $1
 }
 
+function drun () {
+    docker run -d -it --name $2 $1 bash
+}
+
 db() { docker build -t=$1 .; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
