@@ -53,7 +53,7 @@ function drun () {
     docker run -d -it --name $2 $1 bash
 }
 
-db() { docker build -t=$1 .; }
+db() { docker build --build-arg http_proxy=$http_proxy -t=$1 .; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
 
@@ -73,6 +73,7 @@ alias j='jobs -l'
 
 ## Editor ###
 alias vi=vim
+alias viprofile='vi ~/.bash_profile'
 alias vis='vim "+set si"'
 alias edit='vim'
 
@@ -145,11 +146,13 @@ case `uname -s` in
 	}
 	;;
 	SunOS*) 
+	alias psmem="echo ::memstat | mdb -k"
 	alias ifconfig="ifconfig -a | egrep -v 'IPv6|inet6'"
 	alias pgrep='ps -ef | grep -i'
 	alias tailf='tail -f'
 	alias mkdir='mkdir -p'
 	alias netstats='netstat -un -P tcp'
+	alias netstatx='netstat -an -f inet'
 	alias 'netstats -plantu'='netstat -aun'
 	
 	alive () {
