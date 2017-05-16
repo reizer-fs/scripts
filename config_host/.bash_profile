@@ -27,9 +27,9 @@ alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
 #TMUX2.3#
 alias attachmux='tmux -2 attach -t '
 alias lsmux='tmux list-sessions'
-alias newmux='tmux -2 -f /etc/tmux.conf.d/francis.conf new -s '
-alias reloadmux='tmux source-file /etc/tmux.conf.d/francis.conf'
-alias vimux='vim /etc/tmux.conf.d/francis.conf'
+alias newmux='tmux -2 -f /etc/tmux.conf.d/tmux.conf new -s '
+alias reloadmux='tmux source-file /etc/tmux.conf.d/tmux.conf'
+alias vimux='vim /etc/tmux.conf.d/tmux.conf'
 export TERM=dtterm
 
 #Git
@@ -53,7 +53,7 @@ function drun () {
     docker run -d -it --name $2 $1 bash
 }
 
-db() { docker build --build-arg http_proxy=$http_proxy -t=$1 .; }
+db() { docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t=$1 .; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
 
