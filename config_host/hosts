@@ -30,13 +30,14 @@ ff02::3         ipv6-allhosts
 
 #Docker App's
 192.168.92.90  suse-squid
-192.168.92.91  suse-samba
 192.168.92.92  suse-torrentbox
 192.168.92.93  splunk-light
 192.168.92.211  splunk
 192.168.92.212  percona
 192.168.92.101 centos-centreon
+192.168.92.211 centos-poller
 192.168.92.101 centreon
+192.168.92.231  suse-samba
 
 #Web FrontEnd
 192.168.92.200 apache-ffx

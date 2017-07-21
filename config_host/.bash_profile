@@ -50,6 +50,10 @@ function dk () {
 }
 
 function drun () {
+    if [ $# -lt 2 ] ; then
+        echo "Usage : drun image name"
+        exit 1
+    fi
     docker run -d -it --name $2 $1 bash
 }
 
