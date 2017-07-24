@@ -9,6 +9,7 @@ export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput s
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l'
 alias l='ll'
+alias gethost='getent hosts'
 alias setproxy='export https_proxy="http://proxy:8080/" ; export https_proxy="http://proxy:8080/"'
 
 # Docker
@@ -16,7 +17,6 @@ alias cddocker='cd /opt/ffx/docker'
 alias cdscripts='cd /opt/ffx/scripts'
 alias cddata='cd /data/docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
-alias dr='docker rm -v'
 alias dri='docker rmi'
 alias di='docker images'
 alias dvl='docker volume ls'
@@ -51,10 +51,16 @@ function dk () {
 
 function drun () {
     if [ $# -lt 2 ] ; then
-        echo "Usage : drun image name"
-        exit 1
+        echo "Usage : drun \$image \$hostname"
+        return 1
     fi
     docker run -d -it --name $2 $1 bash
+    cp /opt/ffx/systems/ubuntu/etc/systemd/system/docker.template /etc/systemd/system/docker-$2.service
+    sed -i "s/container/$1/" /etc/systemd/system/docker-$2.service
+}
+
+function dr () {
+    docker rm -f -v $1 && rm /etc/systemd/system/docker-$1.service
 }
 
 db() { docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t=$1 .; }
@@ -133,8 +139,6 @@ case `uname -s` in
 	alias ping='ping -c 5'
 	# Docker
 	alias di='docker images'
-	alias dri='docker rmi'
-	alias dr='docker rm'
 	alias dki="docker run -t -i -P"
 	function docker-clean() {
 		docker rmi -f $(docker images -q -a -f dangling=true)
