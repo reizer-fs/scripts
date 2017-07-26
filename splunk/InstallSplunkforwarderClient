@@ -1,0 +1,141 @@
+#!/bin/sh
+#
+# Installation d'un client splunkforwarder
+#
+
+## Mise a jour de la version
+if [ "$1" = "PUSH" ]
+then
+    DIR=/opt/ffx
+    $DIR/Copy_ALL_SolarisLinux $DIR/InstallSplunkforwarderClient
+    exit
+fi
+
+exitstatus() {
+   echo $1
+   echo "Cannot continue"
+   cd /
+   [ -f $TMP_FILE ] && rm $TMP_FILE
+   exit 1
+}
+
+HOST=`uname -n`
+DIR="/tools/list"
+SPLUNKFORWARDER_DIR="$DIR/splunkforwarder"
+SERVER="$SPLUNKFORWARDER_DIR/etc/system/local/server.conf"
+OUTPUTS="$SPLUNKFORWARDER_DIR/etc/system/local/outputs.conf"
+DEPLOYMENT="$SPLUNKFORWARDER_DIR/etc/system/local/deploymentclient.conf"
+TMP_FILE=/tmp/`basename "$0"`.$$
+
+case `uname -s` in
+   SunOS)
+	case `uname -p` in
+		sparc) 	FILE="splunkforwarder-latest-SunOS-sparc"
+			[ `uname -r` = "5.10" ] && TAR="/usr/local/bin/tar"
+		       	;;
+		i386)  FILE="splunkforwarder-latest-SunOS-x86_64"
+			[ `uname -r` = "5.10" ] && TAR="/usr/local/bin/tar"
+			;;
+		*)      exitstatus "No release on repository for this processor type"
+      		        ;;
+	esac
+	;;
+   Linux) 
+   	case `uname -m` in
+   		x86_64) FILE="splunkforwarder-latest-Linux-x86_64" 
+			;;
+   		i686) 	FILE="splunkforwarder-latest-Linux-i686" 
+			;;
+		*)      exitstatus "Bad architecture type (32/64 bits)"
+      		        ;;
+	esac
+	;;
+   *)   exitstatus "No release on repository for this OS"
+        ;;
+esac
+
+SPLUNKFORWARDER_BIN="$SPLUNKFORWARDER_DIR/bin/splunk"
+if [ -f $SPLUNKFORWARDER_BIN ]
+then
+   echo "splunkforwarder is installed on $HOST"
+#   exit 1
+fi
+
+SPLUNKFORWARDER_REPO="/refunix/logiciel/Splunk"
+SPLUNKFORWARDER_REPO_CONF="/refunix/logiciel/Splunk/conf_files"
+[ ! -d $SPLUNKFORWARDER_REPO ] && exitstatus "Cannot access repository"
+
+ENV=`/opt/reizerfs/GetServeurEnvironment`
+if [ "$ENV" = "prod" ]
+then
+	SPLUNK_DEPLOYMENT="clappsplunkdeployment.unix.sits.credit-agricole.fr"
+	SPLUNK_OUTPUT="default-autolb-group-ssl"
+else
+	SPLUNK_DEPLOYMENT="pclappsplunk.unix.sits.credit-agricole.fr"
+	SPLUNK_OUTPUT="default-autolb-group-recette"
+	ENV="rct"
+fi
+
+[ -z "$TAR" ] && TAR="tar"
+CMD="$TAR xfz $SPLUNKFORWARDER_REPO/$FILE"
+
+[ ! -f $SPLUNKFORWARDER_REPO/$FILE ] && exitstatus "File $SPLUNKFORWARDER_REPO/$FILE doesn't exist"
+
+cd $DIR
+$CMD
+if [ $? -ne 0 ]
+then
+   echo "Command \"$CMD\" Failed "
+   echo "Restart splunkforwarder..."
+   $SPLUNKFORWARDER_BIN start
+   cd /
+   exit 1
+fi
+
+echo "[info] Mise a jour des passwords cryptes."
+cp $SPLUNKFORWARDER_REPO_CONF/splunk.secret $SPLUNKFORWARDER_DIR/etc/auth/
+[ $? -ne 0 ] && exitstatus "Failed to copy splunk.secret file"
+chmod 400 $SPLUNKFORWARDER_DIR/etc/auth/splunk.secret
+
+chown -R root:root $DIR/splunkforwarder
+
+$SPLUNKFORWARDER_BIN start --accept-license --answer-yes
+[ $? -ne 0 ] && exitstatus "Cannot start splunkforwader after install"
+cat $SERVER | sed 's/^\[general\]/\[general\]\
+allowRemoteLogin=always/'  > $TMP_FILE && mv $TMP_FILE $SERVER
+
+$SPLUNKFORWARDER_BIN restart
+[ $? -ne 0 ] && exitstatus "Cannot restart after install"
+
+$SPLUNKFORWARDER_BIN set servername $HOST -auth admin:changeme
+IP=`host $HOST | cut -d" " -f4`
+echo "SPLUNK_BINDIP=$IP" > "$SPLUNKFORWARDER_DIR/etc/splunk-launch.conf"
+
+$SPLUNKFORWARDER_BIN set deploy-poll $SPLUNK_DEPLOYMENT:8089 -auth admin:changeme
+$SPLUNKFORWARDER_BIN enable deploy-client
+
+# Mise a jour du forward.
+cp $SPLUNKFORWARDER_REPO_CONF/outputs-$ENV.conf $OUTPUTS
+[ $? -ne 0 ] && exitstatus "Unable to copy outputs.conf"
+
+# Mise a jour des certificats SSL.
+cp -R $SPLUNKFORWARDER_REPO/reizerfs_certs $SPLUNKFORWARDER_DIR/etc/auth/
+[ $? -ne 0 ] && exitstatus "Failed to copy certificates in $SPLUNKFORWARDER_DIR/etc/auth/reizerfs_certs"
+
+# Mise a jour des passwords cryptes.
+cat $SERVER  | sed 's/sslKeysfilePassword.*/sslKeysfilePassword = $1$HN1ehiaHHYqU/' > $TMP_FILE && mv $TMP_FILE $SERVER
+[ $? -ne 0 ] && exitstatus "Failed to modify file $SERVER"
+cat $SERVER  | sed 's/pass4SymmKey.*/pass4SymmKey = $1$S5EK2mPBVtiU/' > $TMP_FILE && mv $TMP_FILE $SERVER
+[ $? -ne 0 ] && exitstatus "Failed to modify file $SERVER"
+cp $SPLUNKFORWARDER_REPO_CONF/passwd $SPLUNKFORWARDER_DIR/etc/
+[ $? -ne 0 ] && exitstatus "Failed to copy passwd file"
+chmod 400 $SPLUNKFORWARDER_DIR/etc/passwd
+
+$SPLUNKFORWARDER_BIN enable boot-start 
+[ $? -ne 0 ] && exitstatus "Cannot set boot-start after install"
+
+$SPLUNKFORWARDER_BIN restart
+[ $? -ne 0 ] && exitstatus "Cannot restart after install"
+
+cd /
+[ -f $TMP_FILE ] && rm $TMP_FILE

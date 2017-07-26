@@ -149,9 +149,6 @@ case `uname -s` in
 	function docker-clean() {
 		docker rmi -f $(docker images -q -a -f dangling=true)
 	}
-	function db (){ 
-		docker build -t="$1" .; 
-	}
 	function dsh () {
 		docker exec -i -t $1 /bin/bash
 	}
