@@ -56,11 +56,17 @@ function drun () {
     fi
     docker run -d -it --name $2 $1 bash
     cp /opt/ffx/systems/ubuntu/etc/systemd/system/docker.template /etc/systemd/system/docker-$2.service
-    sed -i "s/container/$1/" /etc/systemd/system/docker-$2.service
+    sed -i "s/container/$2/" /etc/systemd/system/docker-$2.service
 }
 
 function dr () {
-    docker rm -f -v $1 && rm /etc/systemd/system/docker-$1.service
+    docker rm -f -v $1 && {
+	if [ -e "/etc/systemd/system/docker-$1.service" ]; then
+		rm /etc/systemd/system/docker-$1.service
+		systemctl daemon-reload
+		systemctl reset-failed
+	fi
+    }
 }
 
 db() { docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t=$1 .; }
@@ -120,7 +126,7 @@ case `uname -s` in
 	#Service management
 	alias reload='systemctl reload'
 	alias restart='systemctl restart'
-	alias restart='systemctl restart'
+	alias sysreload='systemctl daemon-reload; systemctl reset-failed'
 	alias start='systemctl start'
 	alias stop='systemctl stop'
 
