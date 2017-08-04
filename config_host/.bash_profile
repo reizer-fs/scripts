@@ -54,7 +54,11 @@ function drun () {
         echo "Usage : drun \$image \$hostname"
         return 1
     fi
-    docker run -d -it --name $2 $1 bash
+    vip=$(getent hosts $2)
+    if [ ! -z $vip ]; then
+       extra_options="$extra_options --publish-all=true"
+    fi
+    docker run -d -it $extra_options --name $2 $1 bash
     cp /opt/ffx/systems/ubuntu/etc/systemd/system/docker.template /etc/systemd/system/docker-$2.service
     sed -i "s/container/$2/" /etc/systemd/system/docker-$2.service
 }

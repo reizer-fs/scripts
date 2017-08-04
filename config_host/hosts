@@ -34,7 +34,9 @@ ff02::3         ipv6-allhosts
 192.168.92.92  suse-torrentbox
 192.168.92.211  suse-splunk
 192.168.92.212  suse-splunk-light
-192.168.92.212  suse-percona
+192.168.92.213  suse-percona
+192.168.92.214  suse-ffx1
+192.168.92.215  suse-ffx2
 192.168.92.101 centos-centreon
 192.168.92.211 centos-poller
 192.168.92.101 centreon
