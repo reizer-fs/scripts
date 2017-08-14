@@ -5,12 +5,14 @@ export https_proxy="http://proxywebsrv.tech.sits.credit-agricole.fr:8080/"
 
 #export PS1="[ \t ] \[$(tput sgr0)\]\[\033[38;5;196m\]\u@\h\[$(tput sgr0)\]\[\033[38;5;15m\]:\[$(tput sgr0)\]\[\033[38;5;196m\]\w:\[$(tput sgr0)\]\[\033[38;5;15m\] \[$(tput sgr0)\]"
 export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput setaf 1)\]\u\[$(tput setaf 1)\]@\[$(tput setaf 1)\]\h \[$(tput setaf 1)\]\W\[$(tput setaf 0)\]]\[$(tput setaf 0)\]\\$ \[$(tput sgr0)\]"
+
 # Common commandfs
 alias ls='ls --color=auto'
 alias ll='ls --color=auto -l'
 alias l='ll'
 alias gethost='getent hosts'
 alias setproxy='export https_proxy="http://proxy:8080/" ; export https_proxy="http://proxy:8080/"'
+alias viprofile='~/.bash_profile'
 
 # Docker
 alias cddocker='cd /opt/ffx/docker'
@@ -33,6 +35,7 @@ alias vimux='vim /etc/tmux.conf.d/tmux.conf'
 export TERM=dtterm
 
 #Git
+alias git='git --color=always'
 alias gp='git push'
 alias gpull='git pull'
 alias gc='git commit -a'
@@ -87,6 +90,7 @@ alias cddownloads='cd /data/docker/samba/samba-basic/shares/downloads/'
 #### Alias Sesction ####
 alias ll='ls -l'
 alias la='ls -ltra'
+alias less='less -r'
 
 alias h='history'
 alias j='jobs -l'
@@ -166,9 +170,7 @@ case `uname -s` in
 	alias pgrep='ps -ef | grep -i'
 	alias tailf='tail -f'
 	alias mkdir='mkdir -p'
-	alias netstats='netstat -un -P tcp'
 	alias netstatx='netstat -an -f inet'
-	alias 'netstats -plantu'='netstat -aun'
 	
 	alive () {
 	ping -s $1 2 4
