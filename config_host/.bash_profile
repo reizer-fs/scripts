@@ -35,12 +35,12 @@ alias vimux='vim /etc/tmux.conf.d/tmux.conf'
 export TERM=dtterm
 
 #Git
-alias git='git --color=always'
+alias git='git'
 alias gp='git push'
 alias gpull='git pull'
 alias gc='git commit -a'
 alias gs='git status -s'
-alias gdiff='git diff'
+alias gdiff='git diff --color=always'
 alias ga='git add'
 
 
