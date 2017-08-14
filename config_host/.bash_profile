@@ -38,7 +38,7 @@ export TERM=dtterm
 alias git='git'
 alias gp='git push'
 alias gpull='git pull'
-alias gc='git commit -a'
+alias gc="git commit -a --author=$HOSTNAME"
 alias gs='git status -s'
 alias gdiff='git diff --color=always'
 alias ga='git add'
