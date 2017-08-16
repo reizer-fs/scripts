@@ -1,3 +1,24 @@
+#!/bin/bash
+
+if [ -f host.env ]; then
+        . host.env
+fi
+
+if [ -z $DOCUMENT_ROOT ] ; then
+        DOCUMENT_ROOT="/opt/ffx/"
+fi
+
+FOLDER_TMUX="/etc/tmux.d"
+FOLDER_DOCKER_SYSTCL="/etc/systemd/system/docker.service.d"
+
+FOLDER_LIST="$FOLDER_TMUX $FOLDER_DOCKER_SYSTCL $DOCUMENT_ROOT"
+
+for i in $FOLDER_LIST ; do
+        if [ ! -d $i ] ; then
+                mkdir -p $i
+        fi
+done
+
 perl -pi -e 's/^PermitRootLogin.*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
 perl -pi -e 's/^CONSOLE=/#CONSOLE=/g' /etc/default/login
 rolemod -K type=normal root
