@@ -171,6 +171,7 @@ case `uname -s` in
 	alias tailf='tail -f'
 	alias mkdir='mkdir -p'
 	alias netstatx='netstat -an -f inet'
+	alias strace='truss  -a  -e  -f  -rall  -wall'
 	
 	alive () {
 	ping -s $1 2 4
