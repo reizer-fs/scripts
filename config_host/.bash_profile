@@ -17,6 +17,7 @@ alias viprofile='~/.bash_profile'
 # Docker
 alias cddocker='cd /opt/ffx/docker'
 alias cdscripts='cd /opt/ffx/scripts'
+alias cdsystem='cd /opt/ffx/systems'
 alias cddata='cd /data/docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
 alias dri='docker rmi'
@@ -38,7 +39,7 @@ export TERM=dtterm
 alias git='git'
 alias gp='git push'
 alias gpull='git pull'
-alias gc="git commit -a --author=$HOSTNAME"
+alias gc="git commit -a "
 alias gs='git status -s'
 alias gdiff='git diff --color=always'
 alias ga='git add'
