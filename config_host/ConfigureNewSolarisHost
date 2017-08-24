@@ -64,3 +64,4 @@ ipadm set-prop -p max_buf=4194304 udp
 
 # Package installation
 pkg install tmux
+pkg install system/font/xorg/iso8859-4 system/font/xorg/iso8859-5 system/font/xorg/iso8859-7 system/font/xorg/iso8859-8 system/font/xorg/iso8859-9
