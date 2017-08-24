@@ -34,7 +34,8 @@ mkdir -p $HOME/.histfile
 
 # LC env configuration
 svccfg -s svc:/system/environment:init setprop environment/LANG = astring: en_US.ISO8859-15
-svccfg -s svc:/system/environment:init setprop environment/LC_ALL = astring: en_US.ISO8859-1
+#svccfg -s svc:/system/environment:init setprop environment/LC_ALL = astring: en_US.ISO8859-1
+svccfg -s svc:/system/environment:init setprop environment/LC_ALL = astring: en_US.UTF-8
 svccfg -s svc:/system/environment:init setprop environment/LC_CTYPE = astring: en_US.ISO8859-1
 svccfg -s svc:/system/environment:init setprop environment/LC_NUMERIC = astring: en_US.ISO8859-1
 svccfg -s svc:/system/environment:init setprop environment/LC_TIME = astring: en_US.ISO8859-1
