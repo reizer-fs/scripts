@@ -18,6 +18,7 @@ alias viprofile='~/.bash_profile'
 alias cddocker='cd /opt/ffx/docker'
 alias cdscripts='cd /opt/ffx/scripts'
 alias cdsystem='cd /opt/ffx/systems'
+alias cdfunction='cd /opt/ffx/scripts/functions'
 alias cddata='cd /data/docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
 alias dri='docker rmi'
@@ -179,3 +180,7 @@ case `uname -s` in
 	}
 	;;
 esac
+
+for f in /opt/ffx/scripts/functions/* ; do
+   . $f
+done

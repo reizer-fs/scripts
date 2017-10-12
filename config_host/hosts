@@ -35,6 +35,7 @@ ff02::3         ipv6-allhosts
 192.168.92.215  suse-ffx2
 192.168.92.101 centos-centreon
 192.168.92.211 centos-poller
+192.168.92.212 centos-percona
 192.168.92.101 centreon
 192.168.92.231  suse-samba
 
