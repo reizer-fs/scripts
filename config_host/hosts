@@ -26,7 +26,6 @@ ff02::3         ipv6-allhosts
 192.168.92.104 mysql-fx
 
 #Docker App's
-192.168.92.90  suse-squid
 192.168.92.92  suse-torrentbox
 192.168.92.211  suse-splunk
 192.168.92.212  suse-splunk-light
@@ -51,3 +50,4 @@ ff02::3         ipv6-allhosts
 192.168.1.103 ffxubswsx
 192.168.1.120 ubuntuffx
 192.168.1.254 BBOX
+192.168.1.253  suse-squid

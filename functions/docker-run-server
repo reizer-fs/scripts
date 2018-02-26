@@ -13,49 +13,35 @@ function docker_run {
 	TYPE=$2
 
 	case $TYPE in
-		mysql|mariadb) 
-			CONTAINER="suse-mysql"
-			PORTS="3306"
-			DATA_VOLUMES="var/lib/mysql"
-			ENV="ADMIN_USER=\"$ADMIN_USER\" ADMIN_PASS=\"$ADMIN_PASS\" RESTRICTED_USER=\"$RESTRICTED_USER\" RESTRICTED_USER_PASSWORD=\"$RESTRICTED_USER_PASSWORD\" RESTRICTED_DB=\"$RESTRICTED_DB\""
-			;;
-		apache) CONTAINER="suse-apache";		PORTS="80 443";;
-		squid)		CONTAINER="suse-squid";		PORTS="3128" ;;
-		samba)		CONTAINER="suse-samba" ;	PORTS="137 139 445" ;;
+		mysql|mariadb) CONTAINER="suse-mysql"; PORTS="3306"; DATA_VOLUME="var/lib/mysql"; ENV="ADMIN_USER=\"$ADMIN_USER\" ADMIN_PASS=\"$ADMIN_PASS\" RESTRICTED_USER=\"$RESTRICTED_USER\" RESTRICTED_USER_PASSWORD=\"$RESTRICTED_USER_PASSWORD\" RESTRICTED_DB=\"$RESTRICTED_DB\"" ;;
+		apache) CONTAINER="suse-apache";PORTS="80 443";;
+		squid)	CONTAINER="suse-squid";	PORTS="3128";	DATA_VOLUME="/var/cache/squid" ;;
+		samba)	CONTAINER="suse-samba";	PORTS="137 139 445" ;;
+		gcc)	CONTAINER="suse-gcc";;
+		splunk)	CONTAINER="suse-splunk";;
 		percona)	CONTAINER="percona/pmm-server";	PORTS="80 443";;
 		torrent)	CONTAINER="suse-torrent";;
 		gitlab)		CONTAINER="suse-gitlab";;
-		gcc)		CONTAINER="suse-gcc";;
-		splunk)		CONTAINER="suse-splunk";;
 		*) help && return 1 ;;
 	esac
 
 	VIP=`getent hosts $HOSTNAME | awk '{print $1}'`
-	ENV_DIRECTORY="/data/docker/$TYPE/$HOSTNAME"
+	ENV_DIRECTORY="/media/fx/3AD8C970D8C92AC9/Docker/$TYPE/$HOSTNAME"
 
 
-	# PORT PUBLICATION
-	if [ -z "$PORTS" ]; then
-		EXTRAOPTIONS="--publish-all=true"
-	fi
-		
 	# Handling data volume
-	if [ ! -z "$DATA_VOLUMES" ] ; then
-		for i in $DATA_VOLUMES ; do
+	if [ ! -z "$DATA_VOLUME" ] ; then
+		for i in $DATA_VOLUME ; do
 			if [ ! -d $ENV_DIRECTORY/$i ] ; then
 				mkdir -p $ENV_DIRECTORY/$i
 			fi
-
-			if [ "$(ls -A $ENV_DIRECTORY/$i)" != "" ] ; then
-				VOLUMES="$VOLUMES -v $ENV_DIRECTORY/$i:/$i"
-			fi
+			VOLUMES="$VOLUMES -v $ENV_DIRECTORY${i}:${i}"
 		done
 	fi
 
-	# Handling data volume
 	if [ ! -z "$PORTS" ] ; then
-		for i in $PORTS ; do
-			PORT=" $PORT -p $VIP:$i:$i"
+		for e in $PORTS ; do
+			VIP=" -p $VIP:$e:$e"
 		done
 	fi
 
@@ -66,11 +52,12 @@ function docker_run {
 		done
 	fi
 
-	docker run -d --name $HOSTNAME -h $HOSTNAME $PORT $VOLUMES $ENV_VARS $EXTRAOPTIONS $CONTAINER
+	docker run -d --restart="always" --name $HOSTNAME -h $HOSTNAME $VIP $VOLUMES $ENV_VARS $EXTRAOPTIONS $CONTAINER
 
 	if [ $? = "0" ]; then
 		cp /opt/ffx/systems/ubuntu/etc/systemd/system/docker.template /etc/systemd/system/docker-$HOSTNAME.service
 		sed -i "s/container/$HOSTNAME/" /etc/systemd/system/docker-$HOSTNAME.service
 		systemctl daemon-reload && return 0
+		systemctl enable docker-$HOSTNAME.service 
 	fi
 }
