@@ -293,7 +293,7 @@ case `uname -s` in
 		docker rmi -f $(docker images -q -a -f dangling=true)
 	}
 	function dsh () {
-		docker exec -i -t $1 /bin/bash
+		docker exec -i -t $1 sh
 	}
 	function dbash () {
 		docker run --rm -i -t -e TERM=xterm --entrypoint /bin/bash $1

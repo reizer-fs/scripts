@@ -10,6 +10,8 @@ ff02::3         ipv6-allhosts
 
 127.0.0.1	ejie.me
 127.0.0.1	suse-squid
+127.0.0.1	alpine
+127.0.0.1	alpine-testssl
 
 #VLAN 92
 192.168.92.1   ffx

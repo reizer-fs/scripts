@@ -5,9 +5,9 @@ function docker_run {
 		echo "type = mysql apache squid samba torrent gitlab gcc"
 	}
 
-	if [ $# -lt 1 ] ; then
-		help && return 1
-	fi
+	#if [ $# -lt 1 ] ; then
+	#	help && return 1
+	#fi
 
 	HOSTNAME=$1
 	TYPE=$2
@@ -22,7 +22,8 @@ function docker_run {
 		percona)	CONTAINER="percona/pmm-server";	PORTS="80 443";;
 		torrent)	CONTAINER="suse-torrent";;
 		gitlab)		CONTAINER="suse-gitlab";;
-		*) help && return 1 ;;
+		alpine)		CONTAINER="alpine";;
+		testssl)	CONTAINER="alpine-testssl";;
 	esac
 
 	VIP=`getent hosts $HOSTNAME | awk '{print $1}'`
@@ -43,6 +44,8 @@ function docker_run {
 		for e in $PORTS ; do
 			VIP=" -p $VIP:$e:$e"
 		done
+	else
+		unset VIP
 	fi
 
 	# Handling environnment variable
