@@ -23,6 +23,7 @@ function docker_run {
 		torrent)	CONTAINER="suse-torrent";;
 		gitlab)		CONTAINER="suse-gitlab";;
 		alpine)		CONTAINER="alpine";;
+		tor)		CONTAINER="alpine-tor" ; PORTS="2090 5566 8118";;
 		testssl)	CONTAINER="alpine-testssl";;
 	esac
 

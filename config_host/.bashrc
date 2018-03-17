@@ -146,20 +146,32 @@ alias ll='ls --color=auto -l'
 alias l='ll'
 alias gethost='getent hosts'
 alias setproxy='export https_proxy="http://localhost:3128/" ; export https_proxy="http://localhost:3128/"'
+alias setproxy='unset https_proxy http_proxy'
 alias viprofile='vim ~/.bashrc'
 
 # Docker
 alias cdfunctions='cd /opt/ffx/scripts/functions'
 alias cddocker='cd /opt/ffx/docker'
+alias cdcompose='cd /opt/ffx/docker/docker-compose'
+alias cdvmware='cd /opt/ffx/vmware'
+alias cddownload='cd ~/Downloads/'
 alias cdscripts='cd /opt/ffx/scripts'
 alias cdsystem='cd /opt/ffx/systems'
 alias cdfunction='cd /opt/ffx/scripts/functions'
-alias cddata='cd /data/docker/'
+alias cdkvm='cd /opt/ffx/kvm'
+alias cddata='cd /docker/'
 alias dp="docker ps -a --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'"
 alias dri='docker rmi'
 alias di='docker images'
 alias dvl='docker volume ls'
 alias dvr='docker volume rm'
+
+# Docker compose
+alias dcu='docker-compose up'
+alias dcud='docker-compose up -d'
+alias dcd='docker-compose down'
+alias dcr='docker-compose rm --force'
+
 
 # Get container IP
 alias dip="docker inspect --format '{{ .NetworkSettings.IPAddress }}'"
@@ -212,7 +224,7 @@ function dr () {
     }
 }
 
-db() { docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t=$1 .; }
+db() { docker build --build-arg https_proxy=$https_proxy --build-arg http_proxy=$http_proxy -t=$(basename `pwd`) . ; }
 dalias() { alias | grep 'docker' | sed "s/^\([^=]*\)=\(.*\)/\1 => \2/"| sed "s/['|\']//g" | sort; }
 
 
@@ -222,7 +234,6 @@ export PS1="\[$(tput bold)\]\[$(tput setaf 0)\]\t \[$(tput setaf 0)\][\[$(tput s
 # Global alias
 alias cdscript='cd /opt/ffx/scripts'
 alias cdplugins='cd /usr/lib/nagios/plugins/'
-alias cddownloads='cd /data/docker/samba/samba-basic/shares/downloads/'
 #### Alias Sesction ####
 alias ll='ls -l'
 alias la='ls -ltra'

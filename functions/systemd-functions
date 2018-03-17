@@ -1,0 +1,17 @@
+
+
+function enable_start_dc_project() {
+        PROJECT=$1
+        DIR_BASE="/opt/ffx/docker/docker-compose"
+        DIR_PROJECT="${DIR_BASE}/${PROJECT}"
+        COMPOSE="${DIR_PROJECT}/docker-compose.yml"
+        
+        [[ -z "$1" ]] && echo "[ error ] : Need argument." && return 1
+        [[ ! -f "${COMPOSE}" ]] && echo "[ error ] : ${COMPOSE} not found." && return 1
+        [[ ! -f /opt/ffx/systems/ubuntu/etc/systemd/system/docker-compose.template ]] && echo "[ error ] Template file not found." && return
+		cp /opt/ffx/systems/ubuntu/etc/systemd/system/docker-compose.template /etc/systemd/system/docker-compose-${PROJECT}.service
+		sed -i "s|template|${COMPOSE}|g" /etc/systemd/system/docker-compose-${PROJECT}.service
+		systemctl daemon-reload && return 0
+		systemctl enable docker-compose-${PROJECT}.service
+		systemctl start docker-compose-${PROJECT}.service
+}
