@@ -1,14 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
 
-if [ ! -f ~/.ssh/id_rsa.pub ] ; then
-	ssh-keygen -t rsa
-fi
-
-if [ ! -z $1 ]; then
-	HOSTS=$1
-fi
+[[ ! -f ~/.ssh/id_rsa.pub ]] && ssh-keygen -t rsa
+[[ ! -z $1 ]] && HOSTS=$1
 
 for hosts in $HOSTS ; do
 	if ping -c 1 $hosts >/dev/null 2>&1 ; then

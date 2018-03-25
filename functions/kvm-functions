@@ -1,0 +1,86 @@
+#!/bin/bash
+
+
+function create_kvm() {
+    unset DISK TEMPLATE OSVARIANT HOST EXTRA_ARGS LEGACY HELP DRY_RUN VERBOSE LOCATION
+
+    OPTS=`getopt -o vhn:o:dl --long verbose,help,name:,os:,dry-run,legacy -n 'parse-options' -- "$@"`
+
+    if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; return 1 ; fi
+
+    #echo "$OPTS"
+    eval set -- "$OPTS"
+
+    while true; do
+      case ${1} in
+          -v|--verbose)     VERBOSE=true; shift;;
+          -h|--help)        HELP=true ; shift ;;
+          -d|--dry-run)     DRY_RUN=true; shift ;;
+          -l|--legacy)      LEGACY=true; shift ;;
+          -n|--name)        HOST=$2 ; shift ; shift ;;
+          -o|--os )         TEMPLATE=$2 ; shift ; shift ;;
+          --) shift ; break ;;
+          *) break ;;
+      esac
+    done
+
+    DIR_BASE="/disks/d/VMWare/KVM"
+    DIR_HOST="${DIR_BASE}/${HOST}"
+    [[ "$HELP" == "true" ]] &&  usage && return 0
+    [[ -z "$HOST" ]] && echo "[ error ] : Invalid name or no name specified." && return 1
+    [[ -z "$HOST" ]] && echo "[ error ] : Invalid name or no name specified." && usage && return 1
+    [[ -z "$TEMPLATE" ]] && echo "[ error ] :  Operating system not specified." && usage && return 1
+    [[ ! -d "$DIR_BASE" ]] && echo "[ error ] : ${DIR_BASE} not found." && return 1
+
+    if [ "$LEGACY" == "true" ]; then
+        case $TEMPLATE in
+            debian8)     LOCATION='--location http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
+            debian7)     LOCATION='--location http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/' ;;    
+            kali)     LOCATION='--location http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
+            centos7)     LOCATION='--location http://mirror.i3d.net/pub/centos/7/os/x86_64/' ;;    
+            centos6)     LOCATION='--location http://mirror.i3d.net/pub/centos/6/os/x86_64/' ;;    
+            opensuse13)     LOCATION='--location http://download.opensuse.org/distribution/13.2/repo/oss/' ;;    
+            opensuse12)     LOCATION='--location http://download.opensuse.org/distribution/12.3/repo/oss/' ;;    
+            *)  echo "[ error ] : operating system not found. => $TEMPLATE" && return 1 ;;
+        esac
+        EXTRA_ARGS="--extra-args console=ttyS0,115200n8 --graphics none ${LOCATION}"
+    else
+        case $TEMPLATE in
+            ubuntu) LOCATION="";;
+            win7) LOCATION="--disk /disks/d/OS/Windows/Windows_7/Windows_7_LITE_X64.iso,device=cdrom";;
+            win7f)  LOCATION="--disk /disks/d/OS/Windows/Windows_7/fr_windows_7_ultimate_x64_dvd_x15-65928.iso,device=cdrom";;
+            mint)   LOCATION="--disk /disks/d/OS/Unix/Mint/linuxmint-18.3-cinnamon-64bit.iso,device=cdrom";;
+            debian9)   LOCATION="--disk /disks/d/OS/Unix/Debian/debian-9.4.0-amd64-netinst.iso,device=cdrom";;
+            centos7) LOCATION="--disk /disks/d/OS/Unix/CentOS/CentOS-7-x86_64-Minimal-1708.iso,device=cdrom";;
+            centos6) LOCATION="--disk /disks/d/OS/Unix/CentOS/CentOS-6.9-x86_64-minimal.iso,device=cdrom";;
+            mac) LOCATION="";;
+            solaris)    
+                    LOCATION="--disk /disks/d/OS/Unix/Solaris/11/sol-11_3-text-x86.iso,device=cdrom --graphics none "
+                    DISK="  --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=ide"
+                    OSVARIANT=" --os-variant solaris11 --noapic"
+                    ;;
+            *)  echo "[ error ] : operating system not found. => $TEMPLATE" && return 1 ;;
+        esac
+        EXTRA_ARGS=" $LOCATION"
+    fi
+
+    [[ -z "$DISK" ]] && DISK=" --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=virtio"
+    [[ -z "$OSVARIANT" ]] && OSVARIANT=" --os-variant ubuntuquantal"
+    # Stop and undefine the VM
+    [[ `virsh list --all --name | grep -q $HOST 2>&1 >/dev/null` ]] && virsh destroy $HOST && virsh undefine $HOST --storage ${DIR_HOST}/${HOST}.qcow2
+    KVM="virt-install --name ${HOST} --ram 1048 --vcpus 1 --os-type linux --network bridge=virbr0 ${OSVARIANT} ${DISK} ${EXTRA_ARGS}"
+    [[ "$DRY_RUN" == 'true' ]] && echo "$KVM" && return 0
+    rm -rf ${DIR_HOST} ; mkdir ${DIR_HOST} || return 1 
+    #qemu-img create -f qcow2 ${DIR_HOST}/${HOST}.qcow2 100G
+    ${KVM} && echo "Done."
+}
+
+function usage() {
+    echo "Usage : ${FUNCNAME[ 1 ]} --name hostname --os debian 
+-h|--help           Print help and exit.
+-d|--dry-run        Print only throughput, do not apply command.
+-l|--legacy         Use files from repository (require Internet connection).
+-o|--os             Select the operating system to install.
+-n|--name           Define the hostname foe the guest system."
+
+}

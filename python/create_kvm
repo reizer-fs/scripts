@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+# encoding: utf-8
+
+
+import sys
+import argparse
+import logging
+from pathlib import Path
+
+
+module = sys.modules['__main__'].__file__
+__author__ = 'FFX'
+__version__ = '1.0'
+log = logging.getLogger(module)
+
+
+def parse_command_line(argv):
+    """Parse command line argument. See -h option
+    :param argv: arguments on the command line must include caller file name.
+    """
+    formatter_class = argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(description=module,formatter_class=formatter_class)
+    parser.add_argument('-n', '--name', dest="name", metavar="hostname",
+                        nargs='?', 
+                        type=str,
+                        required=True,
+                        help="Define a virtual hostname")
+    parser.add_argument('-o', '--os', dest="os", metavar="os",
+                        nargs='?', 
+                        required=True,
+                        type=str,
+                        choices=['debian','mint','centos','mac','w7'],
+                        help="Define a operating system")
+    parser.add_argument("--dry-run", help="Only print throughput, do not execute command.",
+                        action="store_true")
+    parser.add_argument("--legacy", help="Use legacy install (from official repository).",
+                        action="store_true")
+    parser.add_argument("--version", action="version",
+                        version="%(prog)s {}".format(__version__))
+    parser.add_argument("-v", "--verbose", dest="verbose_count",
+                        action="count", default=0,
+                        help="increases log verbosity for each occurence.")
+    arguments = parser.parse_args(argv[1:])
+    # Sets log level to WARN going more verbose for each new -v.
+    log.setLevel(max(3 - arguments.verbose_count, 0) * 10)
+    return arguments
+
+
+def main():
+    """Main program. Sets up logging and do some work."""
+    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
+        format='%(name)s (%(levelname)s): %(message)s')
+
+    kvm = pathlib.Path("/disks/d/VMWare/KVM")
+    os = { 
+        'win7':'/disks/d/OS/Windows/Windows_7/Windows_7_LITE_X64.iso',
+        'win7_full':'/disks/d/OS/Windows/Windows_7/fr_windows_7_ultimate_x64_dvd_x15-65928.iso',
+        'mint':'/disks/d/OS/Unix/Mint/linuxmint-18.3-cinnamon-64bit.iso',
+        'solaris':'/disks/d/OS/Unix/Solaris/11/sol-11_3-text-x86.iso'
+    }
+
+    try:
+        arguments = parse_command_line(sys.argv)
+        # Assign args to variables
+        server = arguments.name
+        os = arguments.os
+        legacy = arguments.legacy
+        dry = arguments.dry_run
+        if kvm.path.exists():
+            kvm_disk = kvm_path + server
+        command = "virt-install --ram 2048 --disk path=${DIR_HOST}/${HOST}.qcow2,size=8 --vcpus 2 --os-type linux --os-variant ubuntuquantal --network bridge=virbr0"
+        if dry:
+            print(command)
+            print(kvm_disk)
+
+    except KeyboardInterrupt:
+        log.error('Program interrupted!')
+    finally:
+        logging.shutdown()
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+OPTS=`getopt -o vhn: --long verbose,dry-run,help -n 'parse-options' -- "$@"`
+
+if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
+
+#echo "$OPTS"
+eval set -- "$OPTS"
+
+VERBOSE=false
+HELP=false
+DRY_RUN=false
+
+while true; do
+  case "$1" in
+    -v | --verbose ) VERBOSE=true; shift ;;
+    -h | --help )    HELP=true; shift ;;
+    -n | --dry-run ) DRY_RUN=true; shift ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+echo VERBOSE=$VERBOSE
+echo HELP=$HELP
+echo DRY_RUN=$DRY_RUN
