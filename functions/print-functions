@@ -1,0 +1,24 @@
+
+#
+# Variables
+#
+RES_COL="60"
+MOVE_TO_COL="\\033[${RES_COL}G"
+SETCOLOR_SUCCESS="\\033[1;32m"
+SETCOLOR_FAILURE="\\033[1;31m"
+SETCOLOR_NORMAL="\\033[0;39m"
+
+##
+# Print a status
+#
+# $1 the code if equal 0 Ok , else nok
+##
+function print_status
+{
+  if [ $1 -eq 0 ]; then
+    echo -e "${MOVE_TO_COL}[${SETCOLOR_SUCCESS}OK${SETCOLOR_NORMAL}]"
+  else
+    echo -e "${MOVE_TO_COL}[${SETCOLOR_FAILURE}NOK${SETCOLOR_NORMAL}]"
+  fi
+}
+
