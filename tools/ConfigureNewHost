@@ -1,0 +1,7 @@
+#!/bin/sh
+
+WORKING_DIR="$( cd "$( dirname $0)" && pwd )"
+HOSTNAME=$(hostname)
+IPADDR=`ifconfig | grep 'inet '|grep -v '127.0.0.1'|awk '{print $2}'|cut -c6-`
+
+
