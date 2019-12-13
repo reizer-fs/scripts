@@ -1,0 +1,50 @@
+#!/bin/bash
+set -e
+
+# Set program name variable - basename without subshell
+prog=${0##*/}
+
+function usage ()
+{
+    cat << EOF
+NAME
+    - Add multiple NIC
+
+SYNOPSIS
+    $prog COMMAND [OPTIONS]
+
+DESCRIPTION
+    A bash wrapper to add multipe virtual ip on a single NIC
+
+COMMANDS
+    help        - show this help or help for a subcommand
+    add         - add virtual adresses
+    remove      - delete virtual adresses
+
+EOF
+exit 0
+}
+
+
+# Console output colors
+bold() { echo -e "\e[1m$@\e[0m" ; }
+red() { echo -e "\e[31m$@\e[0m" ; }
+green() { echo -e "\e[32m$@\e[0m" ; }
+yellow() { echo -e "\e[33m$@\e[0m" ; }
+
+die() { red "ERR: $@" >&2 ; exit 2 ; }
+silent() { "$@" > /dev/null 2>&1 ; }
+output() { echo -e "- $@" ; }
+outputn() { echo -en "- $@ ... " ; }
+ok() { green "${@:-OK}" ; }
+
+pushd() { command pushd "$@" >/dev/null ; }
+popd() { command popd "$@" >/dev/null ; }
+
+#for num in $(seq 150 160) ; do
+#    ip addr add 192.168.71.${num}/24 broadcast 192.168.71.255 dev ens38 label ens38:${num}
+#done
+
+for num in $(seq 100 110) ; do
+    ip addr add 192.168.16.${num}/24 broadcast 192.168.16.255 dev ens32 label ens32:${num}
+done
