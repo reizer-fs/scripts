@@ -77,6 +77,7 @@ function usage_subcommand ()
             printf "    fedora27        Fedora 27                           fedora\n"
             printf "    fedora27-atomic Fedora 27 Atomic Host               fedora\n"
             printf "    ubuntu1604      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu\n"
+            printf "    ubuntu1804      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu\n"
             printf "\n"
             printf "EXAMPLES\n"
             printf "    $prog create foo\n"
