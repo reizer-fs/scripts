@@ -57,7 +57,7 @@ while true; do
   esac
 done
 
-DIR_BASE="$HOME/virt/vms"
+DIR_BASE="$HOME/VMs"
 DIR_HOST="${DIR_BASE}/${HOST}"
 [[ "$HELP" == "true" ]] &&  usage && exit 0
 [[ -z "$HOST" ]] && echo "[ error ] : Invalid name or no name specified." && exit 1
@@ -70,37 +70,25 @@ if [ "$LEGACY" == "true" ]; then
         debian8)     LOCATION='http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
         debian7)     LOCATION='http://ftp.nl.debian.org/debian/dists/wheezy/main/installer-amd64/' ;;    
         kali)     LOCATION='http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
+        centos8)     LOCATION='http://centos.mirrors.proxad.net/8/BaseOS/x86_64/os/' ;;    
+        centos8)     LOCATION='http://mirror.centos.org/centos/8/BaseOS/x86_64/kickstart/' ;;    
         centos7)     LOCATION='http://mirror.i3d.net/pub/centos/7/os/x86_64/' ;;    
         centos6)     LOCATION='http://mirror.i3d.net/pub/centos/6/os/x86_64/' ;;    
         opensuse13)     LOCATION='http://download.opensuse.org/distribution/13.2/repo/oss/' ;;    
         opensuse12)     LOCATION='http://download.opensuse.org/distribution/12.3/repo/oss/' ;;    
         *)  echo "[ error ] : operating system not found. => $TEMPLATE" && exit 1 ;;
     esac
-    EXTRA_ARGS="--extra-args console=ttyS0,115200n8 --graphics none --location ${LOCATION}"
-else
-    case $TEMPLATE in
-        ubuntu)	OSVARIANT="ubuntu18.04";	LOCATION="";;
-        win7)	OSVARIANT="win7";		LOCATION="$HOME/ISO/Windows7LITEX64.iso,device=cdrom,bus=ide --disk $HOME/ISO/virtio-win-drivers-20120712-1.iso,device=cdrom,bus=ide";;
-        debian)	OSVARIANT="debian8";		LOCATION="$HOME/ISO/debian-8.0.0-amd64-netinst.iso";;
-        centos)	OSVARIANT="centos7.0";		LOCATION="$HOME/ISO/CentOS-7-x86_64-Minimal-1503-01.iso";;
-        solaris)    
-                LOCATION="$HOME/ISO/sol-11_3-text-x86.iso,device=cdrom --graphics none "
-                DISK="  --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=ide"
-                OSVARIANT="solaris11 --noapic"
-                ;;
-        *)  echo "[ error ] : operating system not found. => $TEMPLATE" && exit 1 ;;
-    esac
-    EXTRA_ARGS="$EXTRA_ARGS --disk $LOCATION"
+    EXTRA_ARGS="--extra-args console=ttyS0,115200n8 --graphics none --location ${LOCATION} -x 'inst.ks=http://192.168.0.15:8000/ks_centos8.cfg'"
 fi
 
 [[ -z "$DISK" ]] && DISK=" --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=virtio"
 [[ -z "$OSVARIANT" ]] && OSVARIANT="centos7.0"
 OSVARIANT="--os-variant $OSVARIANT"
 # Stop and undefine the VM
-sudo virsh destroy $HOST &>/dev/null && sudo virsh undefine $HOST --storage ${DIR_HOST}/${HOST}.qcow2
-sudo rm -rf ${DIR_HOST} && mkdir ${DIR_HOST}
-KVM="virt-install --name ${HOST} --ram 1048 --vcpus 1 --os-type linux --network bridge=virbr0 ${OSVARIANT} ${DISK} ${EXTRA_ARGS}"
+sudo virsh list --name | grep -q $HOST && sudo virsh destroy $HOST &>/dev/null
+sudo virsh list --all --name | grep -q $HOST && sudo virsh undefine $HOST --storage ${DIR_HOST}/${HOST}.qcow2 &>/dev/null
+sudo rm -rf ${DIR_HOST} &>/dev/null ; mkdir ${DIR_HOST} &>/dev/null
+KVM="virt-install --name ${HOST} --ram 4096 --vcpus 2 --os-type linux --network bridge=br-docker ${OSVARIANT} ${DISK} ${EXTRA_ARGS}"
 if [ "$DRY_RUN" == 'true' ] ; then echo "sudo $KVM" ; exit ;fi
 sudo qemu-img create -f qcow2 ${DIR_HOST}/${HOST}.qcow2 100G
 sudo ${KVM} && echo "Done."
-
