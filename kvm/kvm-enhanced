@@ -814,10 +814,10 @@ function set_defaults ()
     FEATURE=host                    # Use host cpu features to the guest
     MEMORY=2048                     # Amount of RAM in MB
     DISK_SIZE=""                    # Disk Size in GB
-    DNSDOMAIN=example.local         # DNS domain
+    DNSDOMAIN=flexv.inc.eu          # DNS domain
     GRAPHICS=spice                  # Graphics type or "auto"
     RESIZE_DISK=false               # Resize disk (boolean)
-    IMAGEDIR=${HOME}/ISO/IMG        # Directory to store images
+    IMAGEDIR=${HOME}/OS/IMG        # Directory to store images
     VMDIR=${HOME}/VMs               # Directory to store virtual machines
     BRIDGE=br-kvm-docker            # Hypervisor bridge
     PUBKEY=""                       # SSH public key

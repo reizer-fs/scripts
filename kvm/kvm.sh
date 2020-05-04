@@ -80,7 +80,7 @@ DIR_BASE="$HOME/VMs"
 DIR_HOST="${DIR_BASE}/${HOST}"
 KICKSTART_CFG="$HOME/Git/kickstart/ks_rhl8_minimal.cfg"
 KICKSTART_URL_CFG="http://10.11.12.1/ks_rhl8_minimal.cfg"
-EXTRA_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
+EXTRA_KERNEL_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
 OSVARIANT="Linux"
 
 [[ "$HELP" == "true" ]] &&  usage && exit 0
@@ -94,28 +94,27 @@ OSVARIANT="Linux"
     case $TEMPLATE in
         debian8)     LOCATION='http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
         kali)     LOCATION='http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
-        #centos8)     LOCATION='http://centos.mirrors.proxad.net/8/BaseOS/x86_64/os/' ;;    
         centos8)     LOCATION='http://mirror.centos.org/centos/8/BaseOS/x86_64/kickstart/' ;;    
         centos7)     LOCATION='http://mirror.i3d.net/pub/centos/7/os/x86_64/' ;;    
         opensuse13)     LOCATION='http://download.opensuse.org/distribution/13.2/repo/oss/' ;;    
         opensuse12)     LOCATION='http://download.opensuse.org/distribution/12.3/repo/oss/' ;;    
         *)  echo "[ error ] : operating system not found. => $TEMPLATE" && exit 1 ;;
     esac
-    EXTRA_ARGS="$EXTRA_ARGS --location ${LOCATION}" ; }
+    EXTRA_ARGS="$EXTRA_ARGS --location ${LOCATION} $EXTRA_KERNEL_ARGS" ; }
 
 [[ "$LEGACY" == ''  && $CREATE == "true" ]] && 
 {
     case $TEMPLATE in
-        win7)   	OSVARIANT="win7";		CDROM="$HOME/ISO/Windows7LITEX64.iso,device=cdrom,bus=ide --disk $HOME/ISO/virtio-win-drivers-20120712-1.iso,device=cdrom,bus=ide";;
+        winx)   	OSVARIANT="win10";		CDROM="$HOME/OS/WindowsXL/WIN.10.Lite.Edition.v9.2019.x64.iso,device=cdrom,bus=ide --disk $HOME/OS/Drivers/VirtIO/virtio-win-0.1.171.iso,device=cdrom,bus=ide";;
         centos8)	OSVARIANT="centos7.0";		CDROM="$HOME/OS/CentOS8/CentOS-8.1.1911-x86_64-boot.iso";;
         solaris)
-                LOCATION="$HOME/ISO/sol-11_3-text-x86.iso,device=cdrom --graphics none "
+                CDROM="$HOME/ISO/sol-11_3-text-x86.iso,device=cdrom"
                 DISK="  --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=ide"
                 OSVARIANT="solaris11 --noapic"
                 ;;
         *)  echo "[ error ] : operating system not found. => $TEMPLATE" && exit 1 ;;
     esac
-    EXTRA_ARGS="$EXTRA_ARGS --location $CDROM" ; }
+    EXTRA_ARGS="$EXTRA_ARGS --disk $CDROM" ; }
 
 OSVARIANT="--os-variant $OSVARIANT"
 [[ $KS == "true" ]] && EXTRA_ARGS="$EXTRA_ARGS -x inst.ks=$KICKSTART_URL_CFG"
