@@ -4,6 +4,8 @@ set -e
 # Set program name variable - basename without subshell
 prog=${0##*/}
 
+export LIBVIRT_DEFAULT_URI="qemu:///system"
+
 function usage ()
 {
     cat << EOF
@@ -16,7 +18,7 @@ SYNOPSIS
 
 DESCRIPTION
     A bash wrapper around virt-install to build virtual machines on a local KVM
-    hypervisor. You can run it as a normal user which will use qemu:///session
+    hypervisor. You can run it as a normal user which will use $LIBVIRT_DEFAULT_URI
     to connect locally to your KVM domains.
 
 COMMANDS
@@ -526,6 +528,10 @@ function set_network_restart_cmd ()
     esac
 }
 
+function set_home_permissions ()
+{
+    chmod 755 ${HOME}
+}
 function check_delete_known_host ()
 {
     output "Checking for ${IP} in known_hosts file"
@@ -541,6 +547,7 @@ function create_vm ()
     mkdir -p ${VMDIR}
 
     check_vmname_set
+    set_home_permissions
 
     # Start clean
     [ -d "${VMDIR}/${VMNAME}" ] && rm -rf ${VMDIR}/${VMNAME}
@@ -671,14 +678,14 @@ _EOF_
 
     # Assemble disk parameters.
     DISK_PARAMS="$(join ',' \
-        ${DISK} \
+        ${VMDIR}/${VMNAME}/${DISK} \
         $(param format ${DISK_FORMAT}) \
         $(param bus ${DISK_BUS}) \
         ${DISK_EXTRA})"
 
     # Assemble CI ISO disk parameters.
     CI_ISO_PARAMS="$(join ',' \
-        ${CI_ISO} \
+        ${VMDIR}/${VMNAME}/${CI_ISO} \
         ${CI_ISO_EXTRA})"
 
     # Omit the --graphics option to auto-detect.
