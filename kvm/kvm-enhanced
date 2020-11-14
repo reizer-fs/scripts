@@ -86,6 +86,7 @@ function usage_subcommand ()
             printf "    opensuse15      OpenSUSE Leap 15.2                  opensuse\n"
             printf "    ubuntu1604      Ubuntu 16.04 LTS (Xenial Xerus)     ubuntu\n"
             printf "    ubuntu1804      Ubuntu 18.04 LTS (Bionic Beaver)    ubuntu\n"
+            printf "    windows10       Windows 10 (X64)                    windows\n"
             printf "\n"
             printf "EXAMPLES\n"
             printf "    $prog create foo\n"
@@ -283,6 +284,7 @@ function delete_vm ()
     fi
 }
 
+
 function fetch_images ()
 {
     # Create image directory if it doesn't already exist
@@ -412,6 +414,15 @@ function fetch_images ()
             DISK_FORMAT=qcow2
             LOGIN_USER=opensuse
             ;;
+        windows10)
+            QCOW=windows10.x86_64.qcow2
+            OS_TYPE="windows"
+            OS_VARIANT="win10"
+            IMAGE_URL=https://localhost:8000/
+            DISK_FORMAT=qcow2
+            LOGIN_USER=windows
+            NETWORK_MODEL=e1000e
+            ;;
         *)
             die "${DISTRO} not a supported OS.  Run '$prog create help'."
             ;;
@@ -440,6 +451,27 @@ function fetch_images ()
         mv ${IMAGEDIR}/${QCOW}.part ${IMAGEDIR}/${QCOW}
     fi
 
+}
+
+function start_local_repo ()
+{
+    if ps -p $(cat /tmp/http.pid &>/dev/null) &>/dev/null ; then
+        return 0
+    else
+        python3 -m http.server -d ${IMAGEDIR} &>/dev/null &
+        REPO_PID=$!
+        echo ${REPO_PID} > /tmp/http.pid
+    fi
+}
+
+function stop_local_repo ()
+{
+    if ps -p $(cat /tmp/http.pid &>/dev/null) &>/dev/null ; then
+        kill $(cat /tmp/http.pid &>/dev/null) &>/dev/null
+        rm -f /tmp/http.pid &>/dev/null
+    else
+        return 0
+    fi
 }
 
 function check_ssh_key ()
@@ -497,6 +529,8 @@ function set_sudo_group ()
             ;;
         ubuntu*|debian* )
             SUDOGROUP="sudo"
+            ;;
+        windows*)
             ;;
         *)
             die "OS not supported."
@@ -817,7 +851,7 @@ function set_defaults ()
 {
     # Defaults are set here. Override using command line arguments.
     AUTOSTART=true                  # Automatically start VM at boot time
-    CPUS=1                          # Number of virtual CPUs
+    CPUS=2                          # Number of virtual CPUs
     FEATURE=host                    # Use host cpu features to the guest
     MEMORY=4096                     # Amount of RAM in MB
     DISK_SIZE=""                    # Disk Size in GB
@@ -826,7 +860,7 @@ function set_defaults ()
     RESIZE_DISK=false               # Resize disk (boolean)
     IMAGEDIR=${HOME}/OS/IMG         # Directory to store images
     VMDIR=${HOME}/VMs               # Directory to store virtual machines
-    BRIDGE=br-nodes                 # Hypervisor bridge
+    BRIDGE=virbr0                   # Hypervisor bridge
     PUBKEY=""                       # SSH public key
     DISTRO=centos8                  # Distribution
     MACADDRESS=""                   # MAC Address
@@ -1063,8 +1097,11 @@ case "${subcommand}" in
             usage_subcommand "${subcommand}"
         else
             set_defaults
+            stop_local_repo
+            start_local_repo
             set_custom_defaults
             "${subcommand}" "$@"
+            stop_local_repo
             exit $?
         fi
         ;;

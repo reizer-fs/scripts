@@ -54,9 +54,23 @@ delete_domain () {
 
 OPTS=`getopt -o vhn:o:dltkrc --long verbose,help,name:,os:,dry-run,legacy,text,kickstart,create,remove -n 'parse-options' -- "$@"`
 
+function set_defaults ()
+{
+    # Setting default settings
+    DIR_BASE="$HOME/VMs"
+    DIR_HOST="${DIR_BASE}/${HOST}"
+    KICKSTART_CFG="$HOME/Git/kickstart/ks_rhl8_minimal.cfg"
+    KICKSTART_URL_CFG="http://10.11.12.1/ks_rhl8_minimal.cfg"
+    EXTRA_KERNEL_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
+    OSVARIANT="Linux"
+    NCPU="2"
+    NRAM="4096"
+    BRIDGE="virbr0"
+}
+
+set_defaults
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
-#echo "$OPTS"
 eval set -- "$OPTS"
 
 while true; do
@@ -71,17 +85,12 @@ while true; do
       -k|--kickstart )  KS="true" ;         shift ;;
       -n|--name)        HOST=$2 ;           shift ; shift ;;
       -o|--os )         TEMPLATE=$2 ;       shift ; shift ;;
+      -b|--bridge )     BRIDGE=$2 ;       shift ; shift ;;
       --) shift ; break ;;
       *) break ;;
   esac
 done
 
-DIR_BASE="$HOME/VMs"
-DIR_HOST="${DIR_BASE}/${HOST}"
-KICKSTART_CFG="$HOME/Git/kickstart/ks_rhl8_minimal.cfg"
-KICKSTART_URL_CFG="http://10.11.12.1/ks_rhl8_minimal.cfg"
-EXTRA_KERNEL_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
-OSVARIANT="Linux"
 
 [[ "$HELP" == "true" ]] &&  usage && exit 0
 [[ -z "$HOST" ]] && echo "[ error ] : Invalid name or no name specified." && usage && exit 1
@@ -89,7 +98,7 @@ OSVARIANT="Linux"
 [[ ! -d "$DIR_BASE" ]] && mkdir $DIR_BASE
 [[ ! -d "$DIR_HOST" ]] && mkdir $DIR_HOST
 
-[[ "$LEGACY" == "true"  && $CREATE != '' ]] &&
+[[ "$LEGACY" == ""  && $CREATE != '' ]] &&
 {
     case $TEMPLATE in
         debian8)     LOCATION='http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
@@ -102,30 +111,29 @@ OSVARIANT="Linux"
     esac
     EXTRA_ARGS="$EXTRA_ARGS --location ${LOCATION} $EXTRA_KERNEL_ARGS" ; }
 
-[[ "$LEGACY" == ''  && $CREATE == "true" ]] && 
+[[ "$LEGACY" == 'true'  && $CREATE == "true" ]] && 
 {
     case $TEMPLATE in
-        winx)   	OSVARIANT="win10";		CDROM="$HOME/OS/WindowsXL/WIN.10.Lite.Edition.v9.2019.x64.iso,device=cdrom,bus=ide --disk $HOME/OS/Drivers/VirtIO/virtio-win-0.1.171.iso,device=cdrom,bus=ide";;
+        winx)   	OSVARIANT="win10";		LOCATION=" -c $HOME/OS/ISO/Windows/WIN.10.Lite.Edition.v9.2019.x64.iso" ; DISK="--disk path=$HOME/OS/ISO/Windows/virtio-win-0.1.189.iso,device=cdrom,bus=sata";;
         centos8)	OSVARIANT="centos7.0";		CDROM="$HOME/OS/CentOS8/CentOS-8.1.1911-x86_64-boot.iso";;
         solaris)
                 CDROM="$HOME/ISO/sol-11_3-text-x86.iso,device=cdrom"
                 DISK="  --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=ide"
-                OSVARIANT="solaris11 --noapic"
+                OSVARIANT="solaris11"
+                EXTRA_ARGS="--noapic"
                 ;;
         *)  echo "[ error ] : operating system not found. => $TEMPLATE" && exit 1 ;;
     esac
-    EXTRA_ARGS="$EXTRA_ARGS --disk $CDROM" ; }
+    EXTRA_ARGS="$EXTRA_ARGS $LOCATION" ; }
 
-OSVARIANT="--os-variant $OSVARIANT"
 [[ $KS == "true" ]] && EXTRA_ARGS="$EXTRA_ARGS -x inst.ks=$KICKSTART_URL_CFG"
-#[[ "$KS" == "true" ]] && EXTRA_ARGS="$EXTRA_ARGS --initrd-inject $KICKSTART_CFG -x 'ks=file:/ks.cfg'"
 [[ $VERBOSE == "true" ]] && EXTRA_ARGS="$EXTRA_ARGS --debug -x 'rd.shell' -x 'rd.debug'"
 [[ $TEXT == "true" ]] && EXTRA_ARGS="$EXTRA_ARGS -x console=ttyS0,115200n8 --nographics -x 'inst.text'"
-[[ -z $DISK ]] && DISK=" --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=virtio"
 [[ -z $OSVARIANT ]] && OSVARIANT="centos7.0"
 [[ $DELETE == "true" ]] && delete_domain $HOST
 
-KVM="virt-install --name ${HOST} --accelerate --ram 4096 --vcpus 1 --os-type linux --network bridge=br-kvm-docker ${OSVARIANT} ${DISK} ${EXTRA_ARGS}"
+DISK="$DISK --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=virtio"
+KVM="virt-install --name ${HOST} --accelerate --ram ${NRAM} --vcpus ${NCPU} --os-variant ${OSVARIANT} --network bridge=${BRIDGE} ${DISK} ${EXTRA_ARGS}"
 [[ $DRY_RUN = 'true' ]] && echo "sudo $KVM" && exit 0
 [[ $CREATE = "true" ]] && { 
 delete_domain $HOST
