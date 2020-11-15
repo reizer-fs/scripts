@@ -6,10 +6,22 @@
 # Set program name variable - basename without subshell
 prog=${0##*/}
 
+function set_defaults () {
+    # Setting default settings
+    DIR_BASE="$HOME/VMs"
+    KICKSTART_CFG="$HOME/Git/kickstart/ks_rhl8_minimal.cfg"
+    KICKSTART_URL_CFG="http://10.11.12.1/ks_rhl8_minimal.cfg"
+    EXTRA_KERNEL_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
+    OSVARIANT="Linux"
+    NCPU="2"
+    NRAM="4096"
+    NBRIDGE="virbr0"
+}
+
 usage () {
     cat << EOF
 NAME
-    kvm-install-vm - Install virtual guests using cloud-init on a local KVM
+    $prog - Install virtual guests using cloud-init or legacy (with DVD) on a local KVM
     hypervisor.
 
 SYNOPSIS
@@ -32,10 +44,18 @@ COMMANDS
 -v|--verbose        Enable debugging kernel options.
 -n|--name           Define the hostname foe the guest system."
 -d|--dry-run        Print only throughput, do not apply command.
--l|--legacy         Use files from repository (require Internet connection).
--o|--os             Select the operating system to install.
+-l|--legacy         Use local ISO or IMG.
+-o|--os             Select the operating system to install. (default=centos8)
+-b|--bridge         Define the bridge to use (default=virbr0)
 -t|--text           Start the guest in text mode
 -k|--kickstart      Enable kickstart installation mode
+
+Example:
+# Create default VM
+./$prog --create --legacy --name MP000GTW0000
+
+# Create VM with 4 cpus, 4g ram, bridge (dry-run)
+./$prog --create --legacy --name WP000GTW0000 --os windows10 --dry-run
 
 EOF
 exit 0
@@ -45,28 +65,12 @@ delete_domain () {
     [[ -z $1 ]] && echo "Argument required" && return 1
     HOST=$1
     # Stop and undefine the VM
-    #virsh list --name | grep -q $HOST && sudo virsh destroy $HOST &>/dev/null
-    #virsh list --all --name | grep -q $HOST && sudo virsh undefine $HOST --remove-all-storage &>/dev/null
     sudo virsh destroy $HOST &>/dev/null
     sudo virsh undefine $HOST --remove-all-storage &>/dev/null
     sudo virsh pool-destroy $HOST &>/dev/null
 }
 
-OPTS=`getopt -o vhn:o:dltkrc --long verbose,help,name:,os:,dry-run,legacy,text,kickstart,create,remove -n 'parse-options' -- "$@"`
-
-function set_defaults ()
-{
-    # Setting default settings
-    DIR_BASE="$HOME/VMs"
-    DIR_HOST="${DIR_BASE}/${HOST}"
-    KICKSTART_CFG="$HOME/Git/kickstart/ks_rhl8_minimal.cfg"
-    KICKSTART_URL_CFG="http://10.11.12.1/ks_rhl8_minimal.cfg"
-    EXTRA_KERNEL_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
-    OSVARIANT="Linux"
-    NCPU="2"
-    NRAM="4096"
-    BRIDGE="virbr0"
-}
+OPTS=`getopt -o vhn:o:b:dltkrc --long verbose,help,name:,os:,dry-run,bridge,legacy,text,kickstart,create,remove -n 'parse-options' -- "$@"`
 
 set_defaults
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
@@ -85,28 +89,29 @@ while true; do
       -k|--kickstart )  KS="true" ;         shift ;;
       -n|--name)        HOST=$2 ;           shift ; shift ;;
       -o|--os )         TEMPLATE=$2 ;       shift ; shift ;;
-      -b|--bridge )     BRIDGE=$2 ;       shift ; shift ;;
+      -b|--bridge )     BRIDGE=$2 ;         shift ; shift ;;
       --) shift ; break ;;
       *) break ;;
   esac
 done
 
-
 [[ "$HELP" == "true" ]] &&  usage && exit 0
 [[ -z "$HOST" ]] && echo "[ error ] : Invalid name or no name specified." && usage && exit 1
 [[ -z "$TEMPLATE" && $CREATE == "true" ]] && echo "[ error ] :  Operating system not specified." && usage && exit 1
+[[ -z "$DIR_HOST" ]] && DIR_HOST="${DIR_BASE}/${HOST}"
+[[ ! -z "$BRIDGE" ]] && NBRIDGE=$BRIDGE
 [[ ! -d "$DIR_BASE" ]] && mkdir $DIR_BASE
 [[ ! -d "$DIR_HOST" ]] && mkdir $DIR_HOST
 
 [[ "$LEGACY" == ""  && $CREATE != '' ]] &&
 {
     case $TEMPLATE in
-        debian8)     LOCATION='http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
-        kali)     LOCATION='http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
-        centos8)     LOCATION='http://mirror.centos.org/centos/8/BaseOS/x86_64/kickstart/' ;;    
-        centos7)     LOCATION='http://mirror.i3d.net/pub/centos/7/os/x86_64/' ;;    
-        opensuse13)     LOCATION='http://download.opensuse.org/distribution/13.2/repo/oss/' ;;    
-        opensuse12)     LOCATION='http://download.opensuse.org/distribution/12.3/repo/oss/' ;;    
+        debian8)    LOCATION='http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
+        kali)       LOCATION='http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
+        centos8)    LOCATION='http://mirror.centos.org/centos/8/BaseOS/x86_64/kickstart/' ;;    
+        centos7)    LOCATION='http://mirror.i3d.net/pub/centos/7/os/x86_64/' ;;    
+        opensuse13) LOCATION='http://download.opensuse.org/distribution/13.2/repo/oss/' ;;    
+        opensuse12) LOCATION='http://download.opensuse.org/distribution/12.3/repo/oss/' ;;    
         *)  echo "[ error ] : operating system not found. => $TEMPLATE" && exit 1 ;;
     esac
     EXTRA_ARGS="$EXTRA_ARGS --location ${LOCATION} $EXTRA_KERNEL_ARGS" ; }
@@ -114,8 +119,8 @@ done
 [[ "$LEGACY" == 'true'  && $CREATE == "true" ]] && 
 {
     case $TEMPLATE in
-        winx)   	OSVARIANT="win10";		LOCATION=" -c $HOME/OS/ISO/Windows/WIN.10.Lite.Edition.v9.2019.x64.iso" ; DISK="--disk path=$HOME/OS/ISO/Windows/virtio-win-0.1.189.iso,device=cdrom,bus=sata";;
-        centos8)	OSVARIANT="centos7.0";		CDROM="$HOME/OS/CentOS8/CentOS-8.1.1911-x86_64-boot.iso";;
+        windows10)   OSVARIANT="win10";       LOCATION=" -c $HOME/OS/ISO/Windows/WIN.10.Lite.Edition.v9.2019.x64.iso" ; DISK="--disk path=$HOME/OS/ISO/Windows/virtio-win-0.1.189.iso,device=cdrom,bus=sata";;
+        macos)       OSVARIANT="macosx10.7";  LOCATION=" -c $HOME/OS/ISO/MacOSX/MacOSX-Catalina.img" ;;
         solaris)
                 CDROM="$HOME/ISO/sol-11_3-text-x86.iso,device=cdrom"
                 DISK="  --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=ide"
