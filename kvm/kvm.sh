@@ -13,9 +13,10 @@ function set_defaults () {
     KICKSTART_URL_CFG="http://10.11.12.1/ks_rhl8_minimal.cfg"
     EXTRA_KERNEL_ARGS="$EXTRA_ARGS -x 'ipv6.disable=1' -x 'ip=dhcp'"
     OSVARIANT="Linux"
-    NCPU="2"
-    NRAM="4096"
-    NBRIDGE="virbr0"
+    NCPU="1"
+    NRAM="2048"
+    NBRIDGE="br-nodes"
+    DISKSIZE="20G"
 }
 
 usage () {
@@ -107,7 +108,7 @@ done
 {
     case $TEMPLATE in
         debian8)    LOCATION='http://ftp.nl.debian.org/debian/dists/jessie/main/installer-amd64/' ;;    
-        kali)       LOCATION='http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
+        kali)       OSVARIANT="debian10" ; LOCATION='http://http.kali.org/kali/dists/kali-rolling/main/installer-amd64/' ;;    
         centos8)    LOCATION='http://mirror.centos.org/centos/8/BaseOS/x86_64/kickstart/' ;;    
         centos7)    LOCATION='http://mirror.i3d.net/pub/centos/7/os/x86_64/' ;;    
         opensuse13) LOCATION='http://download.opensuse.org/distribution/13.2/repo/oss/' ;;    
@@ -138,9 +139,9 @@ done
 [[ $DELETE == "true" ]] && delete_domain $HOST
 
 DISK="$DISK --disk path=${DIR_HOST}/${HOST}.qcow2,size=100,bus=virtio"
-KVM="virt-install --name ${HOST} --accelerate --ram ${NRAM} --vcpus ${NCPU} --os-variant ${OSVARIANT} --network bridge=${BRIDGE} ${DISK} ${EXTRA_ARGS}"
+KVM="virt-install --name ${HOST} --accelerate --ram ${NRAM} --vcpus ${NCPU} --os-variant ${OSVARIANT} --network bridge=${NBRIDGE} ${DISK} ${EXTRA_ARGS}"
 [[ $DRY_RUN = 'true' ]] && echo "sudo $KVM" && exit 0
 [[ $CREATE = "true" ]] && { 
 delete_domain $HOST
-sudo qemu-img create -f qcow2 ${DIR_HOST}/${HOST}.qcow2 100G
+sudo qemu-img create -f qcow2 ${DIR_HOST}/${HOST}.qcow2 ${DISKSIZE}
 sudo ${KVM} ; }
