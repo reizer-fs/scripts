@@ -5,7 +5,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 IMAGE_NAME="homeassistant/home-assistant"
 
-CONTAINER_NAME="home-assistant-server"
+CONTAINER_NAME="server-home-assistant"
 
 case $PORT in
     ''|*[!0-9]*) PORT=8123;;
