@@ -4,6 +4,7 @@ termux-wake-lock
 PROJECT_DIR="$HOME/projects/prometheus"
 CONFIG_FILE="$PROJECT_DIR/config/prometheus.yml"
 
+pkg install wget
 mkdir -p $PROJECT_DIR/{bin,config,data} 
 cd $PROJECT_DIR
 
