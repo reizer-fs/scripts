@@ -17,6 +17,7 @@ udocker_check
 udocker_prune
 
 udocker_create "$CONTAINER_NAME" "$IMAGE_NAME"
+udocker setup --execmode=F1 "$CONTAINER_NAME"
 
 DATA_DIR="$(pwd)/data-$CONTAINER_NAME"
 
