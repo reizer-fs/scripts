@@ -4,8 +4,9 @@ source "$(dirname "${BASH_SOURCE[0]}")/source.env"
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 IMAGE_NAME="homeassistant/home-assistant"
-
 CONTAINER_NAME="server-home-assistant"
+MODE=F1
+export UDOCKER_DEFAULT_EXECUTION_MODE=$MODE
 
 case $PORT in
     ''|*[!0-9]*) PORT=8123;;
@@ -17,7 +18,7 @@ udocker_check
 udocker_prune
 
 udocker_create "$CONTAINER_NAME" "$IMAGE_NAME"
-udocker setup --execmode=F1 "$CONTAINER_NAME"
+udocker setup --execmode="$MODE" "$CONTAINER_NAME"
 
 DATA_DIR="$(pwd)/data-$CONTAINER_NAME"
 
