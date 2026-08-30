@@ -5,7 +5,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 IMAGE_NAME="homeassistant/home-assistant"
 CONTAINER_NAME="server-home-assistant"
-MODE=F1
+MODE=P1
 export UDOCKER_DEFAULT_EXECUTION_MODE=$MODE
 
 case $PORT in
